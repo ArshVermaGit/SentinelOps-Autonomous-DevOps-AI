@@ -25,7 +25,7 @@ LLM_USER_TEMPLATE = """A CI pipeline has failed. Analyze and respond in JSON onl
   "root_cause": "string - what caused this failure",
   "responsible_files": ["file1.py"],
   "error_category": "dependency|syntax|test|config|runtime|network",
-  "confidence": 0.0,
+  "llm_confidence": 0.0,
   "suggested_fix": "string - specific actionable fix",
   "fix_diff": "string - unified diff format patch",
   "risk_if_unresolved": "string - consequences",
@@ -68,11 +68,11 @@ async def analyze_failure_mock(error_log: str) -> dict:
     """Mock LLM response for demo without API key."""
     return {
         "root_cause": "Import error in database connection module caused by missing environment variable DB_HOST",
-        "responsible_files": ["app/database.py", "docker-compose.yml"],
-        "error_category": "config",
-        "confidence": 0.92,
-        "suggested_fix": "Add DB_HOST to your environment variables or .env file",
-        "fix_diff": "--- a/docker-compose.yml\n+++ b/docker-compose.yml\n@@ -10,6 +10,7 @@\n     environment:\n       - DB_NAME=myapp\n       - DB_USER=postgres\n+      - DB_HOST=postgres\n       - DB_PASSWORD=secret",
+        "responsible_files": ["app/database.py", "docker compose.yml"],
+        "error_category": "logic",
+        "llm_confidence": 0.85,
+        "suggested_fix": "Add DB_HOST=postgres to environment variables to ensure the app can reach the database container.",
+        "fix_diff": "--- a/docker compose.yml\n+++ b/docker compose.yml\n@@ -10,6 +10,7 @@\n     environment:\n       - DB_NAME=myapp\n       - DB_USER=postgres\n+      - DB_HOST=postgres\n       - DB_PASSWORD=secret",
         "risk_if_unresolved": "All database operations will fail in CI and production",
         "estimated_fix_time": "5 minutes",
         "is_mock": True

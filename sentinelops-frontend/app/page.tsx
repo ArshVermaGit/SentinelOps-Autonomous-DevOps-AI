@@ -22,7 +22,7 @@ export default function LandingPage() {
               <Zap className="w-3 h-3" /> DEV-OPS AI CO-PILOT
             </div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-white to-gray-400 bg-clip-text text-transparent">
             Engineering Decision <br /> Intelligence.
           </h1>
           <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
