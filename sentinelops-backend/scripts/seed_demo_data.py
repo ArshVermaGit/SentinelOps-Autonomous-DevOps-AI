@@ -1,5 +1,6 @@
 """
 Seed the database with realistic demo data for hackathon presentation.
+Author: Arsh Verma
 Run: python3 scripts/seed_demo_data.py
 
 Creates:

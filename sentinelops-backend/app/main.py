@@ -1,5 +1,13 @@
+"""
+SentinelOps API - Decision Intelligence for DevOps
+Author: Arsh Verma
+"""
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+"""
+Database Configuration
+Author: Arsh Verma
+"""
 from contextlib import asynccontextmanager
 from app.database import create_tables
 from app.routers import webhooks, repositories, pull_requests, incidents, dashboard, analysis, simulation

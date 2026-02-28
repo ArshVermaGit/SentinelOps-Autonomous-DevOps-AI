@@ -1,3 +1,7 @@
+"""
+SentinelOps Project Configuration
+Author: Arsh Verma
+"""
 from pydantic_settings import BaseSettings
 from typing import Optional
 

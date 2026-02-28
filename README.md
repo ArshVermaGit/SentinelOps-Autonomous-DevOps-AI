@@ -1,6 +1,8 @@
-# SentinelOps 🛡️
+# 🛡️ SentinelOps
 
-### Autonomous DevOps AI Co-Pilot — Engineering Decision Intelligence
+> **Autonomous DevOps AI Co-Pilot**  
+> Developed by **Arsh Verma**
+> — Engineering Decision Intelligence
 
 > Built for **DevDash 2026** Hackathon | "Code the Tomorrow"
 

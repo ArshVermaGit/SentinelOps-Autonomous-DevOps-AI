@@ -1,5 +1,6 @@
 """
 Train the CI failure prediction model.
+Author: Arsh Verma
 Run: python -m app.ml.train
 """
 import pickle

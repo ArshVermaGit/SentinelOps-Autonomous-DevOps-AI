@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
@@ -22,11 +23,17 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="SentinelOps Logo" className="w-9 h-9 rounded-lg object-contain" />
-          <div>
-            <div className="font-bold text-white text-sm">SentinelOps</div>
-            <div className="text-xs text-gray-500">DevOps AI Co-Pilot</div>
-          </div>
+          <Image 
+            src="/logo.png" 
+            alt="SentinelOps Logo" 
+            width={36} 
+            height={36} 
+            className="w-9 h-9 rounded-lg object-contain" 
+          />
+          <div className="flex flex-col">
+          <span className="font-bold text-white tracking-tight">SentinelOps</span>
+          <span className="text-[10px] text-gray-500 font-medium">By Arsh Verma</span>
+        </div>
         </div>
       </div>
       

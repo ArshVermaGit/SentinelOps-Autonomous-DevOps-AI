@@ -1,0 +1,44 @@
+name: SentinelOps CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          cd sentinelops-backend
+          pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 sentinelops-backend --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: sentinelops-frontend/package-lock.json
+      - name: Install dependencies
+        run: |
+          cd sentinelops-frontend
+          npm ci
+      - name: Build
+        run: |
+          cd sentinelops-frontend
+          npm run build

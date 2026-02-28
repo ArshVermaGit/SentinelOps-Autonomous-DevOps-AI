@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Shield, Zap, BarChart3, ArrowRight, Github } from "lucide-react"
 
@@ -16,12 +17,17 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="flex flex-col items-center mb-8">
-            <img src="/logo.png" alt="SentinelOps Logo" className="w-24 h-24 mb-6 shadow-2xl shadow-indigo-500/20 object-contain" />
+            <Image 
+              src="/logo.png" 
+              alt="SentinelOps Logo" 
+              width={100} 
+              height={100} 
+              className="w-20 h-20 mb-6 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+              priority
+            />
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-mono font-bold">
               <Zap className="w-3 h-3" /> DEV-OPS AI CO-PILOT
             </div>
-          </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-linear-to-b from-white to-gray-400 bg-clip-text text-transparent">
             Engineering Decision <br /> Intelligence.
           </h1>
@@ -77,8 +83,9 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="mt-20 text-gray-600 text-xs font-mono">
-        &copy; 2026 SENTINELOPS | BUILT FOR DEVDASH 2026
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/5 text-center text-gray-500 text-sm">
+        <p>© 2026 SentinelOps. Created by Arsh Verma.</p>
       </footer>
     </div>
   )

@@ -1,63 +1,76 @@
-# 🚀 SentinelOps Local Setup Guide (Step-by-Step)
+# 🛠️ SentinelOps Local Setup Guide (The Ultimate Version)
 
-Follow these exact steps to get SentinelOps running perfectly on your Mac.
-
----
-
-## 📋 Prerequisites
-
-- **Docker Desktop**: [Download here](https://www.docker.com/products/docker-desktop/) (Make sure it is OPEN and RUNNING).
-- **Node.js 18+**: [Download here](https://nodejs.org/).
-- **Python 3.11+**: [Download here](https://www.python.org/).
+Welcome to **SentinelOps**! This guide will walk you through setting up the project locally from scratch.
 
 ---
 
-## 🛠️ Step 1: Environment Configuration
+## 🏗️ 1. Prerequisites
 
-1. **Backend Environment**:
-   Open a terminal in the project root and run:
+Before you begin, ensure you have the following installed and running:
+
+- **Docker Desktop**: [Download here](https://www.docker.com/products/docker-desktop/) (**MUST BE RUNNING**)
+- **Node.js 20+**: [Download here](https://nodejs.org/)
+- **Python 3.11+**: [Download here](https://www.python.org/)
+
+---
+
+## 🔧 2. Environment Setup
+
+### 📡 Backend Configuration
+
+1. Navigate to the backend directory:
    ```bash
-   cp sentinelops-backend/.env.example sentinelops-backend/.env
+   cd sentinelops-backend
    ```
-   Now, open `sentinelops-backend/.env` and add your keys:
-   - `OPENAI_API_KEY`: Your OpenAI key.
-   - `GITHUB_TOKEN`: Your GitHub Personal Access Token.
+2. Create your `.env` file from the template:
+   ```bash
+   cp .env.example .env
+   ```
+3. Open `.env` and fill in your keys:
+   - `OPENAI_API_KEY`: Get one from [OpenAI](https://platform.openai.com/)
+   - `GITHUB_TOKEN`: Create a Classic PAT with `repo` scopes [here](https://github.com/settings/tokens)
+
+### 🎨 Frontend Configuration
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd ../sentinelops-frontend
+   ```
+2. Create your `.env.local` file:
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
 ---
 
-## 🏗️ Step 2: Start the Engine (Docker)
+## 🚀 3. Running the Project
 
-Keep your Docker Desktop open, and run this in your terminal (Root Directory):
+### Phase A: Start the Engine (Docker)
+
+In your terminal (from the root or backend folder):
 
 ```bash
 cd sentinelops-backend
 docker compose up -d
 ```
 
-_Wait for all containers (api, worker, postgres, redis) to show "Running" in Docker Desktop._
+_Wait ~1 minute for Postgres and Redis to initialize._
 
----
+### Phase B: Power Up the AI
 
-## 🧠 Step 3: Initialize AI Models & Data
+Run these one-time commands to prep the system:
 
-Run these commands one by one to train the AI and add the beautiful demo data:
+```bash
+# 1. Train the ML Risk Model
+docker compose exec api python -m app.ml.train
 
-1. **Train the ML Model**:
+# 2. Seed the Demo Data (The magic part)
+docker compose exec api env PYTHONPATH=. python scripts/seed_demo_data.py
+```
 
-   ```bash
-   docker compose exec api python -m app.ml.train
-   ```
+### Phase C: Launch the Dashboard
 
-2. **Seed Demo Data** (The most important step for the demo):
-   ```bash
-   docker compose exec api env PYTHONPATH=. python scripts/seed_demo_data.py
-   ```
-
----
-
-## 💻 Step 4: Launch the Dashboard
-
-Open a **NEW terminal window** (keep the other one running) and run:
+Open a **new terminal tab**:
 
 ```bash
 cd sentinelops-frontend
@@ -67,19 +80,24 @@ npm run dev
 
 ---
 
-## 🌐 Step 5: Access the App
+## 🌐 4. Explore the Features
 
-- **Dashboard**: [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
 - **Landing Page**: [http://localhost:3000](http://localhost:3000)
+- **AI Dashboard**: [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
+- **PR Gatekeeper**: View risk scores for pre-seeded PRs.
+- **Incident Explorer**: See AI-explained root causes and simulate fixes.
 
 ---
 
-### 🎥 Demo Recording Tip:
+## 🤝 5. Contributing
 
-1. Start at the **Landing Page**.
-2. Click **"Enter Dashboard"**.
-3. Show the **"PR Gatekeeper"** tab (Red alerts).
-4. Show an **"Incident"** (AI Root Cause).
-5. Open the **"Analytics"** page.
+We love contributions! Please refer to the [templates in .github/](.github/) for bug reports, feature requests, and PRs.
 
-**Deployment Guide**: If you're ready to go live, use the [Deployment Guide](.gemini/antigravity/brain/07a0e04e-59b4-4c38-97d1-8d33d6a5e23c/deployment_guide.md). 🛡️
+## ☕ Support
+
+If you find this project useful, consider supporting the author:
+[Buy Me a Coffee](https://www.buymeacoffee.com/ArshVerma)
+
+---
+
+🛡️ **Built with SentinelOps Decision Intelligence**

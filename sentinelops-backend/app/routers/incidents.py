@@ -1,3 +1,7 @@
+"""
+Incident Management Router
+Author: Arsh Verma
+"""
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
