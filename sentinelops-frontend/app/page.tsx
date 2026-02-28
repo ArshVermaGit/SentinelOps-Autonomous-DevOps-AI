@@ -41,7 +41,7 @@ export default function LandingPage() {
                 Enter Dashboard <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer">
+            <a href="https://github.com/ArshVermaGit/SentinelOps-Autonomous-DevOps-AI" target="_blank" rel="noreferrer">
               <button className="px-8 py-3 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-white rounded-xl font-semibold transition-all flex items-center gap-2">
                 <Github className="w-4 h-4" /> View Source
               </button>
@@ -85,7 +85,13 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-12 border-t border-white/5 text-center text-gray-500 text-sm">
-        <p>© 2026 SentinelOps. Created by Arsh Verma.</p>
+        <p className="mb-4">© 2026 SentinelOps. Created by Arsh Verma.</p>
+        <div className="flex justify-center gap-6">
+          <a href="https://github.com/ArshVermaGit" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
+          <a href="https://www.linkedin.com/in/arshvermadev/" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">LinkedIn</a>
+          <a href="https://x.com/TheArshVerma" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">X (Twitter)</a>
+          <a href="mailto:arshverma.dev@gmail.com" className="hover:text-white transition-colors">Email</a>
+        </div>
       </footer>
     </div>
   )

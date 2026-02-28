@@ -32,7 +32,7 @@ export default function Sidebar() {
           />
           <div className="flex flex-col">
           <span className="font-bold text-white tracking-tight">SentinelOps</span>
-          <span className="text-[10px] text-gray-500 font-medium">By Arsh Verma</span>
+          <a href="https://www.linkedin.com/in/arshvermadev/" target="_blank" rel="noreferrer" className="text-[10px] text-gray-500 font-medium hover:text-white transition-colors">By Arsh Verma</a>
         </div>
         </div>
       </div>
