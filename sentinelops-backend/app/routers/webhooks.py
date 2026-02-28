@@ -1,3 +1,7 @@
+"""
+SentinelOps GitHub Webhook Router
+Author: Arsh Verma
+"""
 from fastapi import APIRouter, Request, Header, HTTPException
 import hmac
 import hashlib

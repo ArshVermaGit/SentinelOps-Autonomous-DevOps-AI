@@ -2,6 +2,10 @@
 GitHub API client for SentinelOps.
 Handles all GitHub API interactions with graceful fallback for demo mode.
 """
+"""
+SentinelOps GitHub API Integration Service
+Author: Arsh Verma
+"""
 import httpx
 import base64
 import re

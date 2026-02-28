@@ -1,3 +1,8 @@
+"""
+SentinelOps LLM Root Cause Analysis Service
+Author: Arsh Verma
+"""
+import os
 from openai import AsyncOpenAI
 from app.config import settings
 import json

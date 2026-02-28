@@ -1,3 +1,7 @@
+"""
+SentinelOps Repository Management Router
+Author: Arsh Verma
+"""
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc

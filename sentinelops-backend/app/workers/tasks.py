@@ -1,3 +1,7 @@
+"""
+SentinelOps Background Worker Tasks
+Author: Arsh Verma
+"""
 from app.workers.celery_app import celery_app
 from app.services.risk_analyzer import RiskAnalyzer
 from app.services.llm_service import analyze_failure
