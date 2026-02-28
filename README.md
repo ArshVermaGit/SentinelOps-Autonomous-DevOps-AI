@@ -173,15 +173,6 @@ sentinelops/
     ├── hooks/                  # Custom React hooks
     └── lib/                    # API client + utilities
 ```
-## ☕ Support the Project
-
-If you find this tool helpful and want to support its development, consider buying me a coffee! Your support helps keep the project alive and free.
-
-<div align="center">
-    
-<a href="https://www.buymeacoffee.com/ArshVerma">
-  <img src="public/buy-me-a-coffee.png" width="200" />
-</a>
 
 </div>
 
