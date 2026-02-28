@@ -1,0 +1,105 @@
+from typing import Dict, List, Any
+import re
+
+class RiskAnalyzer:
+    """Static risk analysis for pull requests."""
+    
+    # Risk weights (sum to 1.0)
+    WEIGHTS = {
+        "lines_changed": 0.25,
+        "file_type_risk": 0.20,
+        "author_history": 0.25,
+        "dependency_changes": 0.20,
+        "complexity_delta": 0.10,
+    }
+    
+    HIGH_RISK_FILE_TYPES = {".json", ".yaml", ".yml", ".toml", ".env", ".tf", ".dockerfile"}
+    LOW_RISK_FILE_TYPES = {".md", ".txt", ".rst"}
+    
+    def analyze_pr(self, pr_data: Dict[str, Any], author_history: Dict) -> Dict:
+        """
+        Returns risk assessment for a pull request.
+        
+        pr_data: {
+            lines_added, lines_deleted, files_changed,
+            file_types: [str], has_config_changes, has_dependency_changes,
+            has_test_changes, complexity_delta
+        }
+        author_history: {
+            total_prs, failed_prs, avg_lines_changed
+        }
+        """
+        
+        # 1. Lines changed score
+        total_lines = pr_data.get("lines_added", 0) + pr_data.get("lines_deleted", 0)
+        lines_score = min(total_lines / 1000, 1.0)  # Normalize to 1000 lines = max risk
+        
+        # 2. File type risk
+        file_types = set(pr_data.get("file_types", []))
+        high_risk_overlap = file_types & self.HIGH_RISK_FILE_TYPES
+        low_risk_overlap = file_types & self.LOW_RISK_FILE_TYPES
+        file_type_score = (
+            len(high_risk_overlap) * 0.3 +
+            (0.2 if pr_data.get("has_config_changes") else 0) +
+            (0.2 if pr_data.get("has_dependency_changes") else 0) +
+            (-0.1 if pr_data.get("has_test_changes") else 0)  # Tests reduce risk
+        )
+        file_type_score = max(0.0, min(1.0, file_type_score))
+        
+        # 3. Author history score
+        total = author_history.get("total_prs", 0)
+        failed = author_history.get("failed_prs", 0)
+        author_score = (failed / total) if total > 0 else 0.3  # Unknown author = 30% baseline
+        
+        # 4. Dependency changes
+        dependency_score = 1.0 if pr_data.get("has_dependency_changes") else 0.0
+        
+        # 5. Complexity delta
+        # Simulated complexity delta via radon (mapped to 0.0 - 1.0)
+        complexity_delta = pr_data.get("complexity_delta", 0.0)
+        complexity_score = min(max(complexity_delta / 10.0, 0.0), 1.0) # Assume 10.0 delta is max risk
+        
+        # Weighted sum matching 01_SYSTEM_ARCHITECTURE.md formula
+        risk_probability = (
+            self.WEIGHTS["lines_changed"] * lines_score +
+            self.WEIGHTS["file_type_risk"] * file_type_score +
+            self.WEIGHTS["author_history"] * author_score +
+            self.WEIGHTS["dependency_changes"] * dependency_score +
+            self.WEIGHTS["complexity_delta"] * complexity_score
+        )
+        
+        risk_probability = round(min(max(risk_probability, 0.0), 1.0), 3)
+        
+        # Risk level classification
+        if risk_probability < 0.35:
+            risk_level = "safe"
+        elif risk_probability < 0.65:
+            risk_level = "caution"
+        else:
+            risk_level = "high"
+        
+        # Risk factors (human readable)
+        risk_factors = []
+        if lines_score > 0.5:
+            risk_factors.append(f"Large change: {total_lines} lines modified")
+        if high_risk_overlap:
+            risk_factors.append(f"High-risk file types: {', '.join(high_risk_overlap)}")
+        if pr_data.get("has_dependency_changes"):
+            risk_factors.append("Dependency file changes detected")
+        if author_score > 0.4:
+            risk_factors.append(f"Author has {int(author_score * 100)}% historical failure rate")
+        if complexity_score > 0.5:
+            risk_factors.append(f"High code complexity delta detected (+{complexity_delta:.1f})")
+        
+        return {
+            "risk_probability": risk_probability,
+            "risk_level": risk_level,
+            "risk_factors": risk_factors,
+            "component_scores": {
+                "lines": lines_score,
+                "file_types": file_type_score,
+                "author_history": author_score,
+                "dependencies": dependency_score,
+                "complexity": complexity_score,
+            }
+        }
