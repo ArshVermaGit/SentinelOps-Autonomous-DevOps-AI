@@ -1,7 +1,7 @@
 # 🛡️ SentinelOps
 
-> **Autonomous DevOps AI Co-Pilot**  
-> Developed by **Arsh Verma** — Engineering Decision Intelligence
+> **AI-Powered DevOps Co-Pilot**  
+> Built by **Arsh Verma** — Bringing intelligence to the dev pipeline.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status: Production Ready](https://img.shields.io/badge/Status-Production--Ready-emerald?style=for-the-badge)](#)
@@ -9,17 +9,15 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-green.svg)](https://fastapi.tiangolo.com/)
 
-SentinelOps is an **Autonomous DevOps AI Co-Pilot** that engineers **Decision Intelligence** into the heart of the delivery pipeline. It eliminates the "fail-react" loop by providing predictive intelligence at the Pull Request gate and automated root-cause analysis for CI/CD failures.
+SentinelOps is an **AI-powered DevOps co-pilot** that helps developers understand their delivery pipelines better. It stops the "fail-react" loop by predicting risks at the PR gate and explaining CI/CD failures in plain English.
 
 ---
 
-- **🔮 Predictive Risk Scoring**: ML-based auditing of PRs before merge using a custom Logistic Regression model.
-- **🧪 Digital Twin Simulation**: Monte Carlo simulations (1,000 iterations) to predict deployment stability and "blast radius."
-- **🗺️ Cluster Risk Heatmap**: Real-time tile-based visualization of repository and cluster-level health.
-- **🧠 Automated Root Cause**: LLM-powered log analysis provides natural language explanations and patch suggestions.
-- **🔍 Similarity Search**: Uses SentenceTransformers to match new failures against historical incident patterns.
-- **⚡ Self-Healing Sandbox**: Simulates AI-suggested fixes in a containerized environment to verify outcomes.
-- **📊 Engineering Analytics**: Real-time visibility into MTTR, deployment stability, and pipeline health.
+- 🎭 **Autonomous Gatekeeper**: Reports risk-based commit statuses directly to GitHub to block unsafe merges. [Setup Guide](./GATEKEEPER_SETUP.md)
+- 🧪 **Digital Twin Simulation**: Monte Carlo simulations (1,000 iterations) to predict deployment stability.
+- 🗺️ **Cluster Risk Heatmap**: Real-time tile-based visualization of repository and cluster-level health.
+- 🧠 **Automated Root Cause**: LLM-powered log analysis provides natural language explanations.
+- 🔍 **Similarity Search**: Matches new failures against historical incident patterns.
 
 ---
 
@@ -36,19 +34,18 @@ Every engineering team suffers from the same pain:
 
 ---
 
-## 💡 Solution
+## 💡 The Solution
 
-SentinelOps is a **real-time AI engineering intelligence system** that:
+SentinelOps is a **real-time engineering insights system** that:
 
 | Feature                          | Description                                                             |
 | -------------------------------- | ----------------------------------------------------------------------- |
-| 🔮 **Merge Risk Gatekeeper**     | Scores every PR before merge: 🟢 Safe / 🟡 Caution / 🔴 High Risk       |
+| 🎭 **GitHub Gatekeeper**         | Reports `success`/`failure` to GitHub to block risky PRs                |
 | 🧪 **Digital Twin Engine**       | Runs 1K Monte Carlo iterations to simulate deployment reliability       |
 | 🗺️ **Cluster Risk Heatmap**      | Premium tile-based health intensity mapping for entire infra clusters   |
 | 🧠 **LLM Root Cause Analysis**   | OpenAI explains _why_ the CI failed + suggests a patch diff             |
 | 🔍 **Failure Similarity Search** | Vectorized search: "95% similar to Incident #234 — memory leak pattern" |
-| ⚡ **Self-Healing Simulation**   | Apply AI patch in sandbox, rerun tests, see predicted outcome           |
-| 📊 **CI Health Analytics**       | Build trends, anomaly detection, flaky test identification              |
+| 📊 **CI Health Analytics**       | Build trends, anomaly detection, and "System Pulse" score               |
 
 ---
 

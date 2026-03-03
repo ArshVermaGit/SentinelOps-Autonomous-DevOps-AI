@@ -1,7 +1,7 @@
 """
-SentinelChat: AI DevOps Command Center Service
+SentinelChat - My AI-powered DevOps Command Center
 Author: Arsh Verma
-Handles natural language queries about repository health and system status.
+Logic for handling natural language queries about repo health and system state.
 """
 from typing import Dict, Any, List
 from openai import AsyncOpenAI
@@ -11,14 +11,14 @@ import json
 
 client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
 
-SYSTEM_PROMPT = """You are SentinelChat, the AI Command Center for SentinelOps.
-You have access to real-time DevOps metrics, risk scores, and incident data.
-Be concise, professional, and data-driven.
-If the user asks about system health, mention the 'System Pulse' resilience score.
+SYSTEM_PROMPT = """You are SentinelChat, a helpful AI built by Arsh to assist with DevOps tasks.
+You have access to real-time metrics, risk scores, and incidents.
+Be direct, professional, and act like a senior engineer. No fluff.
+If they ask about health, point them to the 'System Pulse' resilience score.
 """
 
 async def handle_devops_query(query: str, context_data: Dict[str, Any]) -> str:
-    """Processes a natural language query and returns a helpful AI response."""
+    """Core function to process devops queries and get an AI response."""
     if not client:
         return "I'm currently in offline mode. Please configure an OpenAI API key to enable full AI Command Center capabilities."
 

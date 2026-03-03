@@ -7,7 +7,7 @@ import { apiClient } from "@/lib/api"
 export default function SentinelChat() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<{role: 'user' | 'bot', text: string}[]>([
-    { role: 'bot', text: "Welcome to the Command Center. I'm Sentinel AI. How can I help you optimize your pipelines today?" }
+    { role: 'bot', text: "Hey! I'm Sentinel AI. Need a hand analyzing these pipelines or checking repo health?" }
   ])
   const [input, setInput] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -28,7 +28,7 @@ export default function SentinelChat() {
       const response = await apiClient.post("/dashboard/ai-chat", { query: userMsg })
       setMessages(prev => [...prev, { role: 'bot', text: response.data.response }])
     } catch {
-      setMessages(prev => [...prev, { role: 'bot', text: "Apologies, I'm having trouble connecting to the neural link. Please check your API configuration." }])
+      setMessages(prev => [...prev, { role: 'bot', text: "Gah, lost connection to the server. Check your API key or network?" }])
     } finally {
       setIsTyping(false)
     }
@@ -54,7 +54,7 @@ export default function SentinelChat() {
                   <h3 className="text-sm font-bold text-white leading-none">Sentinel AI</h3>
                   <p className="text-[10px] text-emerald-400 mt-1 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Neural Link Active
+                    AI Core Online
                   </p>
                 </div>
               </div>
@@ -114,7 +114,7 @@ export default function SentinelChat() {
               </div>
               <p className="text-[9px] text-gray-600 mt-3 text-center uppercase tracking-widest font-bold flex items-center justify-center gap-1.5">
                 <Terminal className="w-2.5 h-2.5" />
-                Sentinel-OS AI Core v1.4
+                SentinelOps Core v1.4
               </p>
             </div>
           </motion.div>

@@ -3,9 +3,9 @@ import PageHeader from "@/components/layout/PageHeader"
 import MetricCard from "@/components/dashboard/MetricCard"
 import CIHealthChart from "@/components/dashboard/CIHealthChart"
 import RiskHeatmap from "@/components/dashboard/RiskHeatmap"
-import RecentIncidents from "@/components/dashboard/RecentIncidents"
 import LiveActivityFeed from "@/components/dashboard/LiveActivityFeed"
 import RiskExplainer from "@/components/dashboard/RiskExplainer"
+import LocalSandbox from "@/components/dashboard/LocalSandbox"
 import { useDashboard } from "@/hooks/useDashboard"
 import { AlertTriangle, CheckCircle, GitPullRequest, Zap, Activity, ShieldCheck, Cpu } from "lucide-react"
 import { motion } from "framer-motion"
@@ -16,8 +16,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Engineering Intelligence Dashboard"
-        subtitle="Real-time AI monitoring across all repositories and CI pipelines"
+        title="Engineering Overview"
+        subtitle="Real-time health monitoring across my repos and pipelines"
         badge="LIVE"
       />
 
@@ -34,10 +34,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-[10px] text-gray-500 font-medium">Updated 30s ago</div>
               </div>
-              <h2 className="text-3xl font-bold text-white tracking-tight">System Resilience Score</h2>
+              <h2 className="text-3xl font-bold text-white tracking-tight">System Health Score</h2>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Your infrastructure is currently operating at <span className="text-emerald-400 font-bold">peak performance</span>. 
-                Risk velocity remains low despite a 14% increase in PR activity.
+                The infra looks <span className="text-emerald-400 font-bold">solid</span> right now. 
+                Everything is stable even with the recent spike in PR activity.
               </p>
               <div className="flex items-center gap-6 pt-2">
                 <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function DashboardPage() {
           { feature: "Dependencies (+)", impact: 0.08 },
           { feature: "Test Coverage (-)", impact: -0.10 }
         ]} />
-        <RecentIncidents />
+        <LocalSandbox />
       </div>
     </div>
   )

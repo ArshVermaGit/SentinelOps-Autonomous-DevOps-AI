@@ -1,7 +1,6 @@
 """
-SentinelOps System Resilience Service
+System Resilience Engine - Calculates the 'Pulse' of the infra.
 Author: Arsh Verma
-Calculates a 0-100 'System Pulse' score based on pipeline health and risk velocity.
 """
 from typing import Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +13,7 @@ from datetime import datetime, timedelta
 class ResilienceEngine:
     async def calculate_pulse(self, db: AsyncSession) -> Dict[str, Any]:
         """
-        Calculates the aggregate resilience score.
+        The main calculation for the aggregate pulse score.
         Formula: 0.4 * Stability + 0.3 * Recovery + 0.3 * RiskControl
         """
         thirty_days_ago = datetime.utcnow() - timedelta(days=30)

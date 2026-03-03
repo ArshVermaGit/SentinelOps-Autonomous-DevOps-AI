@@ -15,10 +15,10 @@ export default function RiskExplainer({ drivers }: { drivers: RiskDriver[] }) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            AI Risk Driver Analysis
+            What&apos;s driving the risk?
             <Info className="w-3.5 h-3.5 text-gray-500" />
           </h3>
-          <p className="text-[10px] text-gray-500 font-medium">SHAP-based feature importance breakdown</p>
+          <p className="text-[10px] text-gray-500 font-medium">Breakdown of the AI&apos;s scoring logic</p>
         </div>
       </div>
 

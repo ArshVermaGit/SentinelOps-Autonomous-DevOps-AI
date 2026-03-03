@@ -1,6 +1,6 @@
 # Contributing to SentinelOps 🛡️
 
-First off, thank you for considering contributing to SentinelOps! It's people like you that make SentinelOps a great tool for the engineering community.
+Hey! Thanks for being interested in helping out with SentinelOps. I built this to make DevOps smarter and more proactive, and I'd love to have more devs involved.
 
 ## 🏗️ Architecture Overview
 

@@ -1,12 +1,12 @@
 """
-SentinelOps PR Risk Analysis Service
+PR Risk Analysis Engine - My logic for scoring pull requests.
 Author: Arsh Verma
 """
 from typing import Dict, List, Any
 import re
 
 class RiskAnalyzer:
-    """Static risk analysis for pull requests."""
+    """The main engine for scoring PR risk using static analysis."""
     
     # Risk weights (sum to 1.0)
     WEIGHTS = {
@@ -22,16 +22,7 @@ class RiskAnalyzer:
     
     def analyze_pr(self, pr_data: Dict[str, Any], author_history: Dict) -> Dict:
         """
-        Returns risk assessment for a pull request.
-        
-        pr_data: {
-            lines_added, lines_deleted, files_changed,
-            file_types: [str], has_config_changes, has_dependency_changes,
-            has_test_changes, complexity_delta
-        }
-        author_history: {
-            total_prs, failed_prs, avg_lines_changed
-        }
+        Scoring logic for PRs. Takes in PR data and author history to produce a 0-1 risk score.
         """
         
         # 1. Lines changed score

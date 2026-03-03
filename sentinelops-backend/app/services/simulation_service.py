@@ -1,7 +1,6 @@
 """
-Digital Twin Simulation Service
+Digital Twin Simulation Engine - My logic for predicting deployment outcomes.
 Author: Arsh Verma
-Predicts deployment outcomes by simulating the impact of PR changes on system stability.
 """
 from typing import Dict, List, Any
 import random
@@ -9,13 +8,12 @@ from app.services.ml_predictor import predict_failure_probability, normalize_pr_
 
 class DigitalTwinEngine:
     """
-    Simulates the system's 'Digital Twin' to predict how current changes
-    might interact with existing infrastructure and historical patterns.
+    Simulates how changes might impact the system based on historical patterns.
     """
     
     def simulate_deployment(self, pr_data: Dict[str, Any], repo_stats: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Runs a Monte Carlo simulation of a deployment to estimate reliability.
+        Runs a Monte Carlo simulation (1000 iterations) to estimate reliability.
         """
         # Normalize features for the ML model
         features = normalize_pr_features({

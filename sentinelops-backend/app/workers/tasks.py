@@ -43,6 +43,17 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
     async with AsyncSessionLocal() as db:
         # Fetch PR metadata and diff from GitHub
         pr_data = await gh.get_pull_request(repo_full_name, pr_id)
+        head_sha = pr_data["head"]["sha"]
+        
+        # 1. Set status to PENDING immediately
+        await gh.create_commit_status(
+            repo_full_name, 
+            head_sha, 
+            "pending", 
+            "SentinelOps is calculating merge risk...",
+            target_url=f"{settings.FRONTEND_URL}/dashboard"
+        )
+        
         diff_text = await gh.get_pr_diff(repo_full_name, pr_id)
         author_stats = await gh.get_author_stats(repo_full_name, pr_data["user"]["login"])
         
@@ -65,8 +76,23 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
             "complexity_delta": diff_info["max_complexity_delta"],
         }, author_stats)
         
+        # 2. Report FINAL status based on risk level
+        state = "success" if result["risk_level"] != "high" else "failure"
+        description = "Merge risk is low/moderate." if state == "success" else "High risk detected! Review analysis."
+        
+        await gh.create_commit_status(
+            repo_full_name, 
+            head_sha, 
+            state, 
+            description,
+            target_url=f"{settings.FRONTEND_URL}/dashboard"
+        )
+        
+        # 3. Post humanized PR comment for transparency
+        comment_body = gh.format_pr_risk_comment(result)
+        await gh.create_pr_comment(repo_full_name, pr_id, comment_body)
+        
         # Store or update PR in DB
-        # Check if exists
         res = await db.execute(select(PullRequest).where(PullRequest.github_pr_number == pr_id))
         db_pr = res.scalar_one_or_none()
         
