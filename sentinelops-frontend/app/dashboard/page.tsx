@@ -20,7 +20,7 @@ export default function DashboardPage() {
       />
       
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           label="CI Success Rate"
           value={`${data?.ci.success_rate ?? "—"}%`}
@@ -56,9 +56,9 @@ export default function DashboardPage() {
       </div>
       
       {/* Main content grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* CI Health Chart - wide */}
-        <div className="col-span-2">
+        <div className="lg:col-span-2">
           <CIHealthChart />
         </div>
         {/* Live Activity Feed */}
@@ -68,7 +68,7 @@ export default function DashboardPage() {
       </div>
       
       {/* Bottom row */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <RiskHeatmap repos={data?.repos_list ?? []} />
         <RecentIncidents />
       </div>
