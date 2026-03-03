@@ -8,6 +8,8 @@ import DiffViewer from "@/components/incidents/DiffViewer"
 import SimulationModal from "@/components/incidents/SimulationModal"
 import SimilarityBadge from "@/components/incidents/SimilarityBadge"
 import IncidentMemoryGraph from "@/components/graph/IncidentMemoryGraph"
+import IncidentTimeline from "@/components/incidents/IncidentTimeline"
+import ResolveModal from "@/components/incidents/ResolveModal"
 
 interface GraphData {
   pr_id: string;
@@ -51,12 +53,18 @@ export default function IncidentDetailPage() {
   const [incident, setIncident] = useState<Incident | null>(null)
   const [loading, setLoading] = useState(true)
   const [showSim, setShowSim] = useState(false)
+  const [showResolve, setShowResolve] = useState(false)
   
-  useEffect(() => {
+  const fetchIncident = () => {
     apiClient.get<Incident>(`/incidents/${id}`).then((r: { data: Incident }) => {
       setIncident(r.data)
       setLoading(false)
     }).catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchIncident()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
   
   if (loading) return <div className="text-gray-400 p-8 flex items-center gap-3">
@@ -74,6 +82,18 @@ export default function IncidentDetailPage() {
         badgeColor={incident.status === "open" ? "red" : "emerald"}
       />
       
+      {/* Action Buttons */}
+      {incident.status === "open" && (
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowResolve(true)}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg transition-all flex items-center gap-2"
+          >
+            ✓ Resolve Incident
+          </button>
+        </div>
+      )}
+
       {/* Similarity badge */}
       {incident.similar_incident_id && incident.similarity_score && (
         <SimilarityBadge
@@ -89,6 +109,9 @@ export default function IncidentDetailPage() {
         {/* Memory Graph */}
         <IncidentMemoryGraph data={incident.relationship_data} />
       </div>
+
+      {/* Incident Timeline */}
+      <IncidentTimeline incidentId={id as string} />
       
       {/* Suggested Fix Diff */}
       {incident.fix_diff && (
@@ -111,6 +134,15 @@ export default function IncidentDetailPage() {
         <SimulationModal
           incidentId={id as string}
           onClose={() => setShowSim(false)}
+        />
+      )}
+
+      {/* Resolve Modal */}
+      {showResolve && (
+        <ResolveModal
+          incidentId={id as string}
+          onClose={() => setShowResolve(false)}
+          onResolved={fetchIncident}
         />
       )}
     </div>
