@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, GitPullRequest, AlertTriangle, 
-  BarChart3, GitBranch
+  BarChart3, GitBranch, Settings
 } from "lucide-react"
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/pull-requests", label: "PR Gatekeeper", icon: GitPullRequest },
   { href: "/incidents", label: "Incidents", icon: AlertTriangle },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
 ]
 
 export default function Sidebar() {
@@ -62,7 +63,7 @@ export default function Sidebar() {
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Monitoring 4 repositories</span>
+          <span>AI monitoring active</span>
         </div>
       </div>
     </aside>
