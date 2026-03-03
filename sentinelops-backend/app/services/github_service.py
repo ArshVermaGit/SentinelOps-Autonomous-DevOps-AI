@@ -6,14 +6,15 @@ Handles all GitHub API interactions with graceful fallback for demo mode.
 SentinelOps GitHub API Integration Service
 Author: Arsh Verma
 """
+from typing import Dict, List, Optional, Any
 import httpx
-import base64
-import re
-from app.config import settings
+import logging
 
-GITHUB_API_BASE = "https://api.github.com"
+logger = logging.getLogger(__name__)
 
 class GitHubService:
+    """Service for interacting with the GitHub API with resilience and caching."""
+    
     def __init__(self):
         self.headers = {
             "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
@@ -21,27 +22,35 @@ class GitHubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
     
-    async def get_pull_request(self, repo: str, pr_number: int) -> dict:
-        """Fetch PR metadata."""
+    async def get_pull_request(self, repo: str, pr_number: int) -> Dict[str, Any]:
+        """Fetch pull request metadata from GitHub API."""
         async with httpx.AsyncClient() as client:
-            r = await client.get(
-                f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}",
-                headers=self.headers,
-                timeout=10.0
-            )
-            r.raise_for_status()
-            return r.json()
+            try:
+                r = await client.get(
+                    f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}",
+                    headers=self.headers,
+                    timeout=10.0
+                )
+                r.raise_for_status()
+                return r.json()
+            except httpx.HTTPError as e:
+                logger.error(f"GitHub API Error (PR {pr_number}): {e}")
+                raise
     
     async def get_pr_diff(self, repo: str, pr_number: int) -> str:
-        """Fetch PR unified diff."""
+        """Fetch pull request unified diff text."""
         async with httpx.AsyncClient() as client:
-            r = await client.get(
-                f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}",
-                headers={**self.headers, "Accept": "application/vnd.github.diff"},
-                timeout=10.0
-            )
-            r.raise_for_status()
-            return r.text[:5000]  # Truncate to 5KB
+            try:
+                r = await client.get(
+                    f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}",
+                    headers={**self.headers, "Accept": "application/vnd.github.diff"},
+                    timeout=10.0
+                )
+                r.raise_for_status()
+                return r.text[:5000]
+            except httpx.HTTPError as e:
+                logger.error(f"GitHub API Error (Diff {pr_number}): {e}")
+                return ""
     
     async def get_pr_files(self, repo: str, pr_number: int) -> list[dict]:
         """Get list of files changed in PR."""

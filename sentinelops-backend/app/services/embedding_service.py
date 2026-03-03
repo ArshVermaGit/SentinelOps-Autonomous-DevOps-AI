@@ -18,17 +18,23 @@ def _get_model():
             _model = "mock"
     return _model
 
+_embedding_cache = {}
+
 def embed_log(log_text: str) -> list[float]:
-    """Create embedding vector for log text."""
+    """Create embedding vector for log text with local caching."""
+    clean_log = log_text[-2000:]
+    if clean_log in _embedding_cache:
+        return _embedding_cache[clean_log]
+    
     model = _get_model()
     if model == "mock":
-        # Return a random embedding for demo
-        return np.random.rand(384).tolist()
+        embedding = np.random.rand(384).tolist()
+    else:
+        embedding = model.encode(clean_log, convert_to_numpy=True).tolist()
     
-    # Clean and truncate log
-    clean_log = log_text[-2000:]  # Use last 2000 chars (most relevant)
-    embedding = model.encode(clean_log, convert_to_numpy=True)
-    return embedding.tolist()
+    if len(_embedding_cache) < 100:
+        _embedding_cache[clean_log] = embedding
+    return embedding
 
 def cosine_similarity(a: list, b: list) -> float:
     """Calculate cosine similarity between two embedding vectors."""
