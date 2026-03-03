@@ -9,6 +9,8 @@ Creates:
 - 150+ CI runs (mix of success/failure)
 - 8 incidents with LLM analysis
 - Log embeddings for similarity demo
+- Notifications for recent events
+- Incident timeline events
 """
 import asyncio
 import random
@@ -20,6 +22,8 @@ from app.models.pull_request import PullRequest
 from app.models.ci_run import CIRun
 from app.models.incident import Incident
 from app.models.log_embedding import LogEmbedding
+from app.models.notification import Notification
+from app.models.incident_event import IncidentEvent
 
 REPOS = [
     {"name": "api-gateway", "full_name": "acme-corp/api-gateway", "risk_score": 0.72, "failure_rate": 0.24},
@@ -185,7 +189,7 @@ async def seed():
     async with AsyncSessionLocal() as db:
         # Clear existing data
         from sqlalchemy import delete
-        for model in [LogEmbedding, Incident, CIRun, PullRequest, Repository]:
+        for model in [IncidentEvent, Notification, LogEmbedding, Incident, CIRun, PullRequest, Repository]:
             await db.execute(delete(model))
         await db.commit()
         
@@ -264,6 +268,7 @@ async def seed():
         failed_runs = [r for r in ci_run_objects if r.status == "failure"]
         random.shuffle(failed_runs)
         
+        incident_objects = []
         for i, inc_data in enumerate(INCIDENTS_DATA):
             if i >= len(failed_runs): break
             ci_run = failed_runs[i]
@@ -271,8 +276,13 @@ async def seed():
                 ci_run_id=ci_run.id,
                 **inc_data
             )
+            # Add similarity links between some incidents
+            if i >= 2 and random.random() > 0.5:
+                incident.similar_incident_id = incident_objects[random.randint(0, len(incident_objects) - 1)].id if incident_objects else None
+                incident.similarity_score = round(random.uniform(0.72, 0.96), 2)
             db.add(incident)
             await db.flush()
+            incident_objects.append(incident)
             
             # Create random embedding for each incident
             # Using 384-dimensional vector (typical for all-MiniLM-L6-v2)
@@ -283,13 +293,62 @@ async def seed():
                 cluster_id=random.randint(1, 5)
             )
             db.add(log_emb)
-        
+
+        await db.flush()
+
+        # Create incident timeline events for each incident
+        event_templates = [
+            ("created", "Incident detected", "CI failure detected and logged by monitoring system.", "system"),
+            ("analyzed", "AI root cause analysis complete", "LLM analyzed the failure log and identified the root cause.", "ai"),
+            ("similar_found", "Similar incident found", "Embedding similarity search matched a historical incident.", "ai"),
+            ("fix_suggested", "Fix suggestion generated", "AI generated a patch diff to resolve the issue.", "ai"),
+        ]
+
+        for inc in incident_objects:
+            evt_time = inc.created_at or datetime.utcnow()
+            for j, (etype, title, desc, actor) in enumerate(event_templates):
+                event = IncidentEvent(
+                    incident_id=inc.id,
+                    event_type=etype,
+                    title=title,
+                    description=desc,
+                    actor=actor,
+                    created_at=evt_time + timedelta(minutes=j * 2),
+                )
+                db.add(event)
+
+        # Create notifications for recent events
+        notif_templates = [
+            ("incident", "critical", "New CI Failure Detected", "CI pipeline failed in api-gateway — AI analysis started."),
+            ("pr_risk", "warning", "High-Risk PR Opened", "PR #103 'Migrate auth to JWT' scored 91% failure risk."),
+            ("ci_failure", "critical", "Build Failure", "CI Build & Test failed in data-pipeline after 4m 32s."),
+            ("incident", "info", "Incident Auto-Resolved", "Incident #5 was auto-analyzed — fix estimated at 2 minutes."),
+            ("system", "info", "ML Model Retrained", "CI failure prediction model retrained with 200 new data points."),
+            ("pr_risk", "warning", "Dependency Change Detected", "PR #100 modifies package.json and requirements.txt."),
+            ("ci_failure", "critical", "Security Scan Failed", "Security scan found 2 critical vulnerabilities in payment-service."),
+            ("incident", "info", "Similar Incident Found", "New failure in api-gateway is 94% similar to Incident #1."),
+        ]
+
+        for i, (ntype, severity, title, message) in enumerate(notif_templates):
+            notif = Notification(
+                type=ntype,
+                severity=severity,
+                title=title,
+                message=message,
+                incident_id=incident_objects[i % len(incident_objects)].id if incident_objects else None,
+                is_read="unread" if i < 4 else "read",
+                created_at=datetime.utcnow() - timedelta(hours=i * 2),
+            )
+            db.add(notif)
+
         await db.commit()
         print("✅ Demo data seeded successfully!")
         print(f"   {len(REPOS)} repositories")
         print(f"   {len(pr_objects)} pull requests")
         print(f"   {len(ci_run_objects)} CI runs")
-        print(f"   {len(INCIDENTS_DATA)} incidents with AI analysis and log embeddings")
+        print(f"   {len(incident_objects)} incidents with AI analysis and log embeddings")
+        print(f"   {len(incident_objects) * len(event_templates)} incident timeline events")
+        print(f"   {len(notif_templates)} notifications")
 
 if __name__ == "__main__":
     asyncio.run(seed())
