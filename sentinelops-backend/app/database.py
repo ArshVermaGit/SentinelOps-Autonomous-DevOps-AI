@@ -1,6 +1,8 @@
 """
 SentinelOps Database Configuration
 Author: Arsh Verma
+
+Supports both SQLite (default, for local dev) and PostgreSQL (production).
 """
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -10,7 +12,17 @@ from app.config import settings
 class Base(DeclarativeBase):
     pass
 
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
+# SQLite needs special connect_args to allow multi-threaded access
+connect_args = {}
+if settings.DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=False,
+    connect_args=connect_args
+)
+
 AsyncSessionLocal = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
