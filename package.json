@@ -2,9 +2,11 @@
   "name": "sentinelops-root",
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=sentinelops-frontend\" \"cd sentinelops-backend && docker compose up\"",
+    "dev": "concurrently \"npm run dev --workspace=sentinelops-frontend\" \"cd sentinelops-backend && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload\"",
+    "dev:docker": "concurrently \"npm run dev --workspace=sentinelops-frontend\" \"cd sentinelops-backend && docker compose up\"",
     "install-all": "npm install && cd sentinelops-frontend && npm install && cd ../sentinelops-backend && pip install -r requirements.txt",
-    "backend": "cd sentinelops-backend && docker compose up",
+    "backend": "cd sentinelops-backend && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+    "backend:docker": "cd sentinelops-backend && docker compose up",
     "frontend": "npm run dev --workspace=sentinelops-frontend",
     "lint": "npm run lint --workspace=sentinelops-frontend",
     "build": "npm run build --workspace=sentinelops-frontend"
