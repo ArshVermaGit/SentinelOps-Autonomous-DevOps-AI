@@ -170,7 +170,7 @@ export default function RepositoriesPage() {
               >
                 {/* Header */}
                 <div
-                  className="p-5 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+                  className="p-5 flex items-center justify-between cursor-pointer hover:bg-white/2 transition-colors"
                   onClick={() => toggleExpand(repo.local_path)}
                 >
                   <div className="flex items-center gap-4">
