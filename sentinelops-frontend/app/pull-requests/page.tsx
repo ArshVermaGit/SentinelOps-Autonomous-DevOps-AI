@@ -86,7 +86,14 @@ export default function PullRequestsPage() {
                       </div>
                       
                       <div className="flex-1">
-                        <div className="font-medium text-white">{pr.title}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium text-white">{pr.title}</div>
+                          {pr.github_pr_number === 0 && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 tracking-tight uppercase">
+                              Local
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-3 mt-1">
                           <span className="flex items-center gap-1 text-xs text-gray-500">
                             <User className="w-3 h-3" /> {pr.author}
