@@ -12,11 +12,18 @@ from app.models.incident import Incident
 from app.models.pull_request import PullRequest
 from datetime import datetime, timedelta
 
+from app.services.local_git_service import local_git
+
 router = APIRouter()
 
 @router.get("/summary")
 async def get_dashboard_summary(db: AsyncSession = Depends(get_db)):
     """Main dashboard summary — all key metrics."""
+    from app.config import settings
+    print(f"DEBUG: Dashboard hitting DB -> {settings.DATABASE_URL}")
+    
+    # Sync real-world local data to DB on every refresh
+    await local_git.sync_repositories(db)
     
     # Repository count and avg risk
     repos_result = await db.execute(select(Repository))
