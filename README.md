@@ -13,9 +13,9 @@ SentinelOps is an **AI-powered DevOps co-pilot** that helps developers understan
 
 ---
 
+- 📂 **Repo Manager & Sync**: Link local repos, auto-detect changes, run health checks, and push to GitHub from one dashboard.
 - 🎭 **Autonomous Gatekeeper**: Reports risk-based commit statuses directly to GitHub to block unsafe merges. [Setup Guide](./GATEKEEPER_SETUP.md)
 - 🧪 **Digital Twin Simulation**: Monte Carlo simulations (1,000 iterations) to predict deployment stability.
-- 🗺️ **Cluster Risk Heatmap**: Real-time tile-based visualization of repository and cluster-level health.
 - 🧠 **Automated Root Cause**: LLM-powered log analysis provides natural language explanations.
 - 🔍 **Similarity Search**: Matches new failures against historical incident patterns.
 
@@ -38,14 +38,14 @@ Every engineering team suffers from the same pain:
 
 SentinelOps is a **real-time engineering insights system** that:
 
-| Feature                          | Description                                                             |
-| -------------------------------- | ----------------------------------------------------------------------- |
-| 🎭 **GitHub Gatekeeper**         | Reports `success`/`failure` to GitHub to block risky PRs                |
-| 🧪 **Digital Twin Engine**       | Runs 1K Monte Carlo iterations to simulate deployment reliability       |
-| 🗺️ **Cluster Risk Heatmap**      | Premium tile-based health intensity mapping for entire infra clusters   |
-| 🧠 **LLM Root Cause Analysis**   | OpenAI explains _why_ the CI failed + suggests a patch diff             |
-| 🔍 **Failure Similarity Search** | Vectorized search: "95% similar to Incident #234 — memory leak pattern" |
-| 📊 **CI Health Analytics**       | Build trends, anomaly detection, and "System Pulse" score               |
+| Feature                          | Description                                                              |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| 📂 **Repo Manager & Sync**       | Link repos, auto-detect changes, health checks, one-click push to GitHub |
+| 🎭 **GitHub Gatekeeper**         | Reports `success`/`failure` to GitHub to block risky PRs                 |
+| 🧪 **Digital Twin Engine**       | Runs 1K Monte Carlo iterations to simulate deployment reliability        |
+| 🧠 **LLM Root Cause Analysis**   | OpenAI explains _why_ the CI failed + suggests a patch diff              |
+| 🔍 **Failure Similarity Search** | Vectorized search: "95% similar to Incident #234 — memory leak pattern"  |
+| 📊 **CI Health Analytics**       | Build trends, anomaly detection, and "System Pulse" score                |
 
 ---
 
@@ -115,19 +115,7 @@ cd sentinelops-backend
 docker compose up -d
 ```
 
-### 4. Train the ML model
-
-```bash
-docker compose exec api python -m app.ml.train
-```
-
-### 5. Seed demo data
-
-```bash
-docker compose exec api python scripts/seed_demo_data.py
-```
-
-### 6. Start the frontend
+### 4. Start the frontend
 
 ```bash
 cd sentinelops-frontend
@@ -135,11 +123,20 @@ npm install
 npm run dev
 ```
 
-### 7. Access the application
+### 5. Access the application
 
 - **Dashboard:** http://localhost:3000/dashboard
 - **API Docs:** http://localhost:8000/docs
 - **API Health:** http://localhost:8000/health
+
+---
+
+## 📂 Real-World Workflow
+
+1. **Dashboard:** See your aggregate system pulse.
+2. **Repo Manager:** Link your local repository folders.
+3. **Local Sandbox:** Real-time risk detection as you code.
+4. **PR Gatekeeper:** AI-scored risk profiles for every change.
 
 ---
 
@@ -164,11 +161,11 @@ sentinelops/
     ├── app/
     │   ├── dashboard/          # Main dashboard
     │   ├── incidents/          # Incident explorer
-    │   ├── repositories/       # Risk heatmap
+    │   ├── repositories/       # Repo Manager & Sync
     │   ├── pull-requests/      # PR gatekeeper
     │   └── analytics/          # Engineering insights
     ├── components/             # Reusable UI components
-    ├── hooks/                  # Custom React hooks
+    ├── hooks/                  # Custom React hooks (useRepoManager, etc.)
     └── lib/                    # API client + utilities
 ```
 
