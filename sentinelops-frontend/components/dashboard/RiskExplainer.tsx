@@ -44,13 +44,15 @@ export default function RiskExplainer({ drivers }: { drivers: RiskDriver[] }) {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-white/5">
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3">
-          <p className="text-[10px] text-indigo-300 leading-relaxed italic">
-            &quot;The primary risk driver is the author&apos;s historical failure rate combined with high lines changed, suggesting a complex refactor at risk of regression.&quot;
-          </p>
+      {drivers.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-white/5">
+          <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3">
+            <p className="text-[10px] text-indigo-300 leading-relaxed italic">
+              AI Analysis: High impact drivers indicate potential regression risk in the largest {drivers[0].feature.replace('_', ' ')} changes.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -48,6 +48,14 @@ export default function LiveActivityFeed() {
       </div>
       
       <div className="space-y-3 overflow-y-auto max-h-[280px]">
+        {activities.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20 animate-pulse mb-3" />
+            <p className="text-[10px] text-gray-600 font-medium leading-relaxed">
+              No recent activity detected.<br/>Linked repositories are currently stable.
+            </p>
+          </div>
+        )}
         {activities.map((activity) => {
           const config = typeConfig[activity.type]
           return (

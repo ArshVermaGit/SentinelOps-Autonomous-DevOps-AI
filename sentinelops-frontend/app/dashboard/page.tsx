@@ -39,19 +39,23 @@ export default function DashboardPage() {
             <div className="space-y-4 max-w-lg">
               <div className="flex items-center gap-2">
                 <div className={`px-2 py-1 ${data?.pulse?.status === 'CRITICAL' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'} rounded border text-[10px] font-bold tracking-widest uppercase`}>
-                  {data?.pulse?.status ?? "Initializing..."}
+                  {data?.pulse?.status ?? "Initializing Sync..."}
                 </div>
-                <div className="text-[10px] text-gray-500 font-medium whitespace-nowrap">
-                  Updated {data?.pulse?.last_updated ? "just now" : "awaiting sync"}
-                </div>
+                {data?.pulse?.last_updated && (
+                  <div className="text-[10px] text-gray-500 font-medium whitespace-nowrap">Updated just now</div>
+                )}
               </div>
-              <h2 className="text-3xl font-bold text-white tracking-tight">System Health Score</h2>
+              <h2 className="text-3xl font-bold text-white tracking-tight">System Health Pulse</h2>
               <p className="text-sm text-gray-400 leading-relaxed">
-                {data?.pulse?.pulse_score && data.pulse.pulse_score > 85 
-                  ? "The infra looks solid right now. Everything is stable even with recent activity."
-                  : data?.pulse?.pulse_score && data.pulse.pulse_score > 65
-                  ? "System is stable with some caution required in recent changes."
-                  : "Critical health detected. Review high-risk activities immediately."}
+                {!data?.pulse ? (
+                  "Scanning your linked repositories for real-world risk and stability metrics..."
+                ) : data.pulse.pulse_score > 85 ? (
+                  <>The infrastructure is <span className="text-emerald-400 font-bold">solid</span>. Stability metrics exceed targets with current PR activity.</>
+                ) : data.pulse.pulse_score > 65 ? (
+                  <>System is <span className="text-indigo-400 font-bold">stable</span>. Some cautious patterns detected in recent local code changes.</>
+                ) : (
+                  <>System at <span className="text-red-400 font-bold">risk</span>. Critical health issues detected in recent CI runs or PR analysis.</>
+                )}
               </p>
               <div className="flex items-center gap-6 pt-2">
                 <div className="flex items-center gap-2">
@@ -97,7 +101,7 @@ export default function DashboardPage() {
         <MetricCard
           label="CI Success Rate"
           value={data ? `${data.ci.success_rate}%` : "—"}
-          change={data ? "Real-time sync" : "Loading..."}
+          change={data ? "Real-time sync" : "Calculating..."}
           changeType="neutral"
           icon={CheckCircle}
           color="emerald"
@@ -143,13 +147,7 @@ export default function DashboardPage() {
       {/* Bottom row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-white text-sm">
         <RiskHeatmap repos={data?.repos_list ?? []} />
-        <RiskExplainer drivers={data?.repos_list?.[0]?.risk_drivers ?? [
-          { feature: "Lines Changed (+)", impact: 0.25 },
-          { feature: "Author History (+)", impact: 0.18 },
-          { feature: "Complexity (+)", impact: 0.12 },
-          { feature: "Dependencies (+)", impact: 0.08 },
-          { feature: "Test Coverage (-)", impact: -0.10 }
-        ]} />
+        <RiskExplainer drivers={data?.repos_list?.[0]?.risk_drivers ?? []} />
         <LocalSandbox />
       </div>
     </div>
