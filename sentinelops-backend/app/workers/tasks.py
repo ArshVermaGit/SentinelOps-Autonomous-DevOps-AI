@@ -7,6 +7,7 @@ from app.services.risk_analyzer import RiskAnalyzer
 from app.services.llm_service import analyze_failure
 from app.services.embedding_service import embed_log, find_similar_incidents
 from app.services.github_service import GitHubService
+from app.config import settings
 import asyncio
 
 @celery_app.task(bind=True, max_retries=3)
