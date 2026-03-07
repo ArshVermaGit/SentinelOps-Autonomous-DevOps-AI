@@ -2,21 +2,30 @@
 SentinelOps API - Decision Intelligence for DevOps
 Author: Arsh Verma
 """
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import logging
 import traceback
-from app.config import settings
-"""
-Database Configuration
-Author: Arsh Verma
-"""
-from contextlib import asynccontextmanager
-from app.database import create_tables
-from app.routers import webhooks, repositories, pull_requests, incidents, dashboard, analysis, simulation, settings as settings_router, analytics_advanced, local_dev
-from app.services.websocket_service import manager
+
 import uvicorn
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from app.config import settings
+from app.database import create_tables
+from app.routers import (
+    analysis,
+    analytics_advanced,
+    dashboard,
+    incidents,
+    local_dev,
+    pull_requests,
+    repositories,
+    simulation,
+    webhooks,
+)
+from app.routers import settings as settings_router
+from app.services.websocket_service import manager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
