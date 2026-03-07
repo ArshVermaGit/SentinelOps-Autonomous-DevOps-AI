@@ -2,7 +2,7 @@
 PR Risk Analysis Engine - My logic for scoring pull requests.
 Author: Arsh Verma
 """
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 import re
 
 class RiskAnalyzer:
@@ -20,7 +20,7 @@ class RiskAnalyzer:
     HIGH_RISK_FILE_TYPES = {".json", ".yaml", ".yml", ".toml", ".env", ".tf", ".dockerfile"}
     LOW_RISK_FILE_TYPES = {".md", ".txt", ".rst"}
     
-    def analyze_pr(self, pr_data: Dict[str, Any], author_history: Dict) -> Dict:
+    def analyze_pr(self, pr_data: Dict[str, Any], author_history: Dict[str, Any]) -> Dict[str, Any]:
         """
         Scoring logic for PRs. Takes in PR data and author history to produce a 0-1 risk score.
         """
@@ -52,7 +52,8 @@ class RiskAnalyzer:
         # 5. Complexity delta
         # Simulated complexity delta via radon (mapped to 0.0 - 1.0)
         complexity_delta = pr_data.get("complexity_delta", 0.0)
-        complexity_score = min(max(complexity_delta / 10.0, 0.0), 1.0) # Assume 10.0 delta is max risk
+        # Assume 10.0 delta is max risk
+        complexity_score = min(max(complexity_delta / 10.0, 0.0), 1.0)
         
         # Weighted sum matching 01_SYSTEM_ARCHITECTURE.md formula
         risk_probability = (
