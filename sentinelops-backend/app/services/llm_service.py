@@ -4,7 +4,7 @@ Author: Arsh Verma
 """
 import os
 from openai import AsyncOpenAI
-from app.config import settings
+from app.core.config import settings
 import json
 import re
 

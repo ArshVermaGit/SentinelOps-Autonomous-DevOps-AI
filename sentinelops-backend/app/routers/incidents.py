@@ -9,7 +9,7 @@ from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from app.database import get_db
+from app.core.database import get_db
 from app.models.incident import Incident
 from app.models.ci_run import CIRun
 from app.models.incident_event import IncidentEvent

@@ -5,11 +5,11 @@ Author: Arsh Verma
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
-from app.database import get_db
+from app.core.database import get_db
 from app.services.risk_analyzer import RiskAnalyzer
 from app.services.ml_predictor import predict_failure_probability, normalize_pr_features
 from app.services.llm_service import analyze_failure, analyze_failure_mock
-from app.config import settings
+from app.core.config import settings
 
 router = APIRouter()
 risk_analyzer = RiskAnalyzer()

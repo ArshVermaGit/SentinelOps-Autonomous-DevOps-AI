@@ -5,7 +5,7 @@ Author: Arsh Verma
 import asyncio
 import logging
 
-from app.config import settings
+from app.core.config import settings
 from app.services.embedding_service import embed_log, find_similar_incidents
 from app.services.github_service import GitHubService
 from app.services.llm_service import analyze_failure
@@ -43,7 +43,7 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
     """Analyze a PR for risk using real diff data and author stats."""
     from sqlalchemy import select
 
-    from app.database import AsyncSessionLocal
+    from app.core.database import AsyncSessionLocal
     from app.models.pull_request import PullRequest
     from app.utils.diff_parser import parse_unified_diff
 
@@ -138,7 +138,7 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
 async def _analyze_ci_run(run_id: int, repo_full_name: str):
     from sqlalchemy import select
 
-    from app.database import AsyncSessionLocal
+    from app.core.database import AsyncSessionLocal
     from app.models.ci_run import CIRun
     from app.models.incident import Incident
     from app.models.log_embedding import LogEmbedding
@@ -202,7 +202,7 @@ async def _update_all_repo_health():
     """Aggregate CI performance metrics across all repositories."""
     from sqlalchemy import select
 
-    from app.database import AsyncSessionLocal
+    from app.core.database import AsyncSessionLocal
     from app.models.ci_run import CIRun
     from app.models.repository import Repository
 

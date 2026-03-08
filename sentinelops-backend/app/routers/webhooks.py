@@ -5,7 +5,7 @@ Author: Arsh Verma
 from fastapi import APIRouter, Request, Header, HTTPException
 import hmac
 import hashlib
-from app.config import settings
+from app.core.config import settings
 from app.workers.tasks import analyze_pull_request_task, analyze_ci_run_task
 
 router = APIRouter()

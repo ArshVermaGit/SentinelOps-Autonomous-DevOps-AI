@@ -6,7 +6,7 @@ Author: Arsh Verma
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
-from app.database import get_db
+from app.core.database import get_db
 from app.models.incident import Incident
 from app.models.ci_run import CIRun
 from app.models.pull_request import PullRequest

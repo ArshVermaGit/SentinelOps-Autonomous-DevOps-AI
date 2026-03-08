@@ -4,7 +4,7 @@ Author: Arsh Verma
 """
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, JSON
 from datetime import datetime
-from app.database import Base
+from app.core.database import Base
 
 class IncidentEvent(Base):
     __tablename__ = "incident_events"

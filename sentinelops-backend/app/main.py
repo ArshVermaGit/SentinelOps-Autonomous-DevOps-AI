@@ -11,8 +11,8 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.config import settings
-from app.database import create_tables
+from app.core.config import settings
+from app.core.database import create_tables
 from app.routers import (
     analysis,
     analytics_advanced,

@@ -5,7 +5,7 @@ Author: Arsh Verma
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
-from app.database import get_db
+from app.core.database import get_db
 from app.models.repository import Repository
 from app.models.ci_run import CIRun
 from app.models.incident import Incident
@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("/summary")
 async def get_dashboard_summary(db: AsyncSession = Depends(get_db)):
     """Main dashboard summary — all key metrics."""
-    from app.config import settings
+    from app.core.config import settings
     print(f"DEBUG: Dashboard hitting DB -> {settings.DATABASE_URL}")
     
     # Sync real-world local data to DB on every refresh

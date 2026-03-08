@@ -6,7 +6,7 @@ import joblib
 import pickle
 import numpy as np
 from pathlib import Path
-from app.config import settings
+from app.core.config import settings
 
 # Load model at startup
 _model_cache = None

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
 
-from app.database import AsyncSessionLocal
+from app.core.database import AsyncSessionLocal
 from app.models.ci_run import CIRun
 from app.models.repository import Repository
 from app.workers.celery_app import celery_app

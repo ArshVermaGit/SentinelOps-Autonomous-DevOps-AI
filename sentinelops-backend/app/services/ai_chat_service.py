@@ -5,7 +5,7 @@ Logic for handling natural language queries about repo health and system state.
 """
 from typing import Dict, Any, List
 from openai import AsyncOpenAI
-from app.config import settings
+from app.core.config import settings
 from app.services.resilience_service import resilience_engine
 import json
 

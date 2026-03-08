@@ -4,7 +4,7 @@ Author: Arsh Verma
 """
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from datetime import datetime
-from app.database import Base
+from app.core.database import Base
 
 class Notification(Base):
     __tablename__ = "notifications"

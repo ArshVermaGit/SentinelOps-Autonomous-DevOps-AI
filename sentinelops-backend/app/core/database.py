@@ -6,7 +6,7 @@ Supports both SQLite (default, for local dev) and PostgreSQL (production).
 """
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
-from app.config import settings
+from .config import settings
 
 # Base class for SQLAlchemy models
 class Base(DeclarativeBase):

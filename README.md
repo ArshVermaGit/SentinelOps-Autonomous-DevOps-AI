@@ -96,38 +96,49 @@ GitHub Webhooks → FastAPI → Redis Queue → Celery Workers
 
 ```bash
 git clone https://github.com/ArshVermaGit/SentinelOps-Autonomous-DevOps-AI
-cd sentinelops
+cd SentinelOps
 ```
 
-### 2. Configure environment variables
+### 2. Standardized Setup
+
+We provide a `Makefile` to simplify development. Run the following command to install all dependencies and configure your environment:
 
 ```bash
-cp sentinelops-backend/.env.example sentinelops-backend/.env
-# Edit .env and add your API keys:
-# OPENAI_API_KEY=sk-...
-# GITHUB_TOKEN=ghp_...
+make setup
 ```
 
-### 3. Start backend services
+This will:
+
+- Install root dependencies.
+- Setup the frontend (install packages, create `.env.local`).
+- Setup the backend (create virtual environment, install requirements, create `.env`).
+
+### 3. Start Developing
+
+You can start both the frontend and backend with a single command:
 
 ```bash
-cd sentinelops-backend
-docker compose up -d
+make dev
 ```
 
-### 4. Start the frontend
-
-```bash
-cd sentinelops-frontend
-npm install
-npm run dev
-```
-
-### 5. Access the application
-
-- **Dashboard:** http://localhost:3000/dashboard
+- **Dashboard:** http://localhost:3000
 - **API Docs:** http://localhost:8000/docs
 - **API Health:** http://localhost:8000/health
+
+---
+
+## 🤝 Contributing
+
+We love contributions! SentinelOps is built to be modular and easy to extend.
+
+1. **Check the [Contributing Guide](./CONTRIBUTING.md)** for architecture details and coding standards.
+2. **Standard Commands:**
+   - `make lint`: Run all linters.
+   - `make format`: Auto-format code.
+   - `make test`: Run the test suite.
+   - `make build`: Production build.
+
+---
 
 ---
 
@@ -144,18 +155,15 @@ npm run dev
 
 ```
 sentinelops/
-├── sentinelops-backend/        # FastAPI Python backend
-│   ├── app/
-│   │   ├── main.py             # FastAPI app
-│   │   ├── models/             # SQLAlchemy ORM models
-│   │   ├── routers/            # API route handlers
-│   │   ├── services/           # Business logic
-│   │   ├── workers/            # Celery background tasks
-│   │   └── ml/                 # ML model training + inference
-│   ├── scripts/
-│   │   └── seed_demo_data.py   # Demo data seeder
-│   ├── docker-compose.yml
-│   └── requirements.txt
+## 🚀 Backend Development
+
+We recommend using the root `Makefile` for a consistent experience across the project.
+
+- `make setup`: Setup the backend environment (venv, dependencies).
+- `make dev`: Start the FastAPI server.
+- `make lint`: Run flake8.
+- `make format`: Run black and isort.
+- `make test`: Run pytest.
 │
 └── sentinelops-frontend/       # Next.js 14 frontend
     ├── app/
