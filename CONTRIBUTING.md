@@ -14,9 +14,30 @@ SentinelOps is built with a decoupled architecture to ensure scalability:
 
 ### 1. Setting Up for Development
 
-Follow the **Quick Start** guide in the [README.md](./README.md) to get the environment running.
+The easiest way to get started is by using the provided `Makefile`:
 
-### 2. Adding New AI Analysis Rules
+```bash
+make setup
+```
+
+This ensures all environment variables, virtual environments, and dependencies are correctly configured.
+
+### 2. Development Workflow
+
+- **Branching**: Create a new branch for every feature or bug fix: `git checkout -b feature/your-feature-name`.
+- **Linting & Formatting**: We enforce strict linting. Before committing, run:
+  ```bash
+  make format  # Auto-formats Python (Black/Isort) and JS/TS (Prettier)
+  make lint    # Checks for errors
+  ```
+- **Testing**: Ensure your changes don't break existing functionality:
+  ```bash
+  make test
+  ```
+
+### 3. Adding New AI Analysis Rules
+
+... (rest of the sections remain same or slightly refined)
 
 If you want to improve the `RiskAnalyzer` or `SimulationEngine`:
 
