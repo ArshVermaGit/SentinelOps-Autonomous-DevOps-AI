@@ -1,9 +1,6 @@
-import { Inter } from "next/font/google"
 import "./globals.css"
 import type { Metadata } from "next"
 import LayoutWrapper from "@/components/layout/LayoutWrapper"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "SentinelOps | DevOps AI Co-Pilot by Arsh Verma",
@@ -19,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/logo.png" />
       </head>
-      <body className={`${inter.className} bg-[#0a0f1e] text-white min-h-screen`}>
+      <body className={`font-sans bg-[#0a0f1e] text-white min-h-screen`}>
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
