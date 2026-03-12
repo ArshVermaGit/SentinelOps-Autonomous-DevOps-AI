@@ -175,7 +175,7 @@ async def get_recent_activities(limit: int = 15, db: AsyncSession = Depends(get_
         activities.append({
             "id": f"inc_{inc.id}",
             "type": "incident",
-            "message": f"AI analysis complete: {inc.root_cause[:50]}...",
+            "message": f"AI analysis complete: {(inc.root_cause or 'Unknown')[:50]}...",
             "time": inc.created_at,
             "timestamp": inc.created_at,
         })
