@@ -35,7 +35,11 @@ manager = ConnectionManager()
 
 async def broadcast_new_incident(incident_id: int):
     await manager.broadcast(
-        {"type": "new_incident", "incident_id": incident_id, "message": f"New incident detected: #{incident_id}"}
+        {
+            "type": "new_incident",
+            "incident_id": incident_id,
+            "message": f"New incident detected: #{incident_id}",
+        }
     )
 
 
