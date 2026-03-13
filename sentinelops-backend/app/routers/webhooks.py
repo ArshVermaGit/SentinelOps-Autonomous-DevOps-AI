@@ -15,12 +15,18 @@ router = APIRouter()
 
 def verify_github_signature(payload: bytes, signature: str) -> bool:
     """Verify GitHub webhook signature."""
-    expected = hmac.new(settings.GITHUB_WEBHOOK_SECRET.encode(), payload, hashlib.sha256).hexdigest()
+    expected = hmac.new(
+        settings.GITHUB_WEBHOOK_SECRET.encode(), payload, hashlib.sha256
+    ).hexdigest()
     return hmac.compare_digest(f"sha256={expected}", signature)
 
 
 @router.post("/github")
-async def github_webhook(request: Request, x_github_event: str = Header(None), x_hub_signature_256: str = Header(None)):
+async def github_webhook(
+    request: Request,
+    x_github_event: str = Header(None),
+    x_hub_signature_256: str = Header(None),
+):
     payload = await request.body()
 
     # Verify signature (skip in dev mode)
