@@ -18,7 +18,9 @@ router = APIRouter()
 
 
 @router.get("/mttr")
-async def get_mttr_analytics(days: int = Query(default=30, le=90), db: AsyncSession = Depends(get_db)):
+async def get_mttr_analytics(
+    days: int = Query(default=30, le=90), db: AsyncSession = Depends(get_db)
+):
     """
     Calculate Mean Time to Recovery (MTTR) from real incident data.
     Returns daily MTTR trend + overall MTTR.
@@ -26,10 +28,15 @@ async def get_mttr_analytics(days: int = Query(default=30, le=90), db: AsyncSess
     start = datetime.utcnow() - timedelta(days=days)
 
     # Get all incidents in timeframe
-    result = await db.execute(select(Incident).where(Incident.created_at >= start).order_by(Incident.created_at))
+    result = await db.execute(
+        select(Incident)
+        .where(Incident.created_at >= start)
+        .order_by(Incident.created_at)
+    )
     incidents = result.scalars().all()
 
-    # For resolved incidents, calculate resolution time from created_at to simulation/resolution
+    # For resolved incidents, calculate resolution time from
+    # created_at to simulation/resolution
     # For demo purposes, we estimate resolution time based on estimated_fix_time field
     fix_time_map = {
         "2 minutes": 2,
@@ -91,7 +98,9 @@ async def get_churn_correlation(db: AsyncSession = Depends(get_db)):
     Return code churn vs CI failure rate — scatter plot data.
     Each data point is a PR with its lines changed and whether its CI runs failed.
     """
-    result = await db.execute(select(PullRequest).order_by(desc(PullRequest.created_at)).limit(50))
+    result = await db.execute(
+        select(PullRequest).order_by(desc(PullRequest.created_at)).limit(50)
+    )
     prs = result.scalars().all()
 
     data_points = []
@@ -128,7 +137,10 @@ async def get_deployment_stability(db: AsyncSession = Depends(get_db)):
             }
             for r in repos
         ],
-        "overall_stability": round(sum(r.deployment_stability or 0 for r in repos) / max(len(repos), 1) * 100, 1),
+        "overall_stability": round(
+            sum(r.deployment_stability or 0 for r in repos) / max(len(repos), 1) * 100,
+            1,
+        ),
     }
 
 
@@ -138,7 +150,9 @@ async def get_incidents_explained_ratio(db: AsyncSession = Depends(get_db)):
     total_result = await db.execute(select(func.count(Incident.id)))
     total = total_result.scalar() or 0
 
-    explained_result = await db.execute(select(func.count(Incident.id)).where(Incident.root_cause.isnot(None)))
+    explained_result = await db.execute(
+        select(func.count(Incident.id)).where(Incident.root_cause.isnot(None))
+    )
     explained = explained_result.scalar() or 0
 
     return {
