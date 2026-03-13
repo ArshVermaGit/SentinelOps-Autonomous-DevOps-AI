@@ -1,0 +1,11 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "sentinelops-backend",
+      "extraPaths": ["sentinelops-backend"]
+    }
+  ],
+  "venvPath": "sentinelops-backend/.venv",
+  "venv": ".",
+  "extraPaths": ["sentinelops-backend"]
+}
