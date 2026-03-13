@@ -18,12 +18,23 @@ class RiskAnalyzer:
         "complexity_delta": 0.10,
     }
 
-    HIGH_RISK_FILE_TYPES = {".json", ".yaml", ".yml", ".toml", ".env", ".tf", ".dockerfile"}
+    HIGH_RISK_FILE_TYPES = {
+        ".json",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".env",
+        ".tf",
+        ".dockerfile",
+    }
     LOW_RISK_FILE_TYPES = {".md", ".txt", ".rst"}
 
-    def analyze_pr(self, pr_data: Dict[str, Any], author_history: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_pr(
+        self, pr_data: Dict[str, Any], author_history: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
-        Scoring logic for PRs. Takes in PR data and author history to produce a 0-1 risk score.
+        Scoring logic for PRs. Takes in PR data and author history to produce
+        a 0-1 risk score.
         """
 
         # 1. Lines changed score
@@ -44,7 +55,9 @@ class RiskAnalyzer:
         # 3. Author history score
         total = author_history.get("total_prs", 0)
         failed = author_history.get("failed_prs", 0)
-        author_score = (failed / total) if total > 0 else 0.3  # Unknown author = 30% baseline
+        author_score = (
+            (failed / total) if total > 0 else 0.3
+        )  # Unknown author = 30% baseline
 
         # 4. Dependency changes
         dependency_score = 1.0 if pr_data.get("has_dependency_changes") else 0.0
@@ -83,17 +96,38 @@ class RiskAnalyzer:
         if pr_data.get("has_dependency_changes"):
             risk_factors.append("Dependency file changes detected")
         if author_score > 0.4:
-            risk_factors.append(f"Author has {int(author_score * 100)}% historical failure rate")
+            risk_factors.append(
+                f"Author has {int(author_score * 100)}% historical failure rate"
+            )
         if complexity_score > 0.5:
-            risk_factors.append(f"High code complexity delta detected (+{complexity_delta:.1f})")
+            risk_factors.append(
+                f"High code complexity delta detected (+{complexity_delta:.1f})"
+            )
 
         # Risk drivers for explainability (magnitude of contribution)
         risk_drivers = [
-            {"feature": "Lines Changed (+)", "impact": round(self.WEIGHTS["lines_changed"] * lines_score, 2)},
-            {"feature": "High-Risk Files (+)", "impact": round(self.WEIGHTS["file_type_risk"] * file_type_score, 2)},
-            {"feature": "Author History (+)", "impact": round(self.WEIGHTS["author_history"] * author_score, 2)},
-            {"feature": "Dependencies (+)", "impact": round(self.WEIGHTS["dependency_changes"] * dependency_score, 2)},
-            {"feature": "Complexity (+)", "impact": round(self.WEIGHTS["complexity_delta"] * complexity_score, 2)},
+            {
+                "feature": "Lines Changed (+)",
+                "impact": round(self.WEIGHTS["lines_changed"] * lines_score, 2),
+            },
+            {
+                "feature": "High-Risk Files (+)",
+                "impact": round(self.WEIGHTS["file_type_risk"] * file_type_score, 2),
+            },
+            {
+                "feature": "Author History (+)",
+                "impact": round(self.WEIGHTS["author_history"] * author_score, 2),
+            },
+            {
+                "feature": "Dependencies (+)",
+                "impact": round(
+                    self.WEIGHTS["dependency_changes"] * dependency_score, 2
+                ),
+            },
+            {
+                "feature": "Complexity (+)",
+                "impact": round(self.WEIGHTS["complexity_delta"] * complexity_score, 2),
+            },
         ]
         # Sort by impact
         risk_drivers.sort(key=lambda x: x["impact"], reverse=True)
