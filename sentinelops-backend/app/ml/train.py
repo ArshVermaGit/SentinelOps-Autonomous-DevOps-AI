@@ -37,7 +37,9 @@ def train():
     X = df[FEATURE_COLS].values
     y = df[TARGET_COL].values
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
     # Build pipeline: scaler + logistic regression
     pipeline = Pipeline(
@@ -46,7 +48,10 @@ def train():
             (
                 "classifier",
                 LogisticRegression(
-                    max_iter=1000, C=1.0, class_weight="balanced", random_state=42  # Handle class imbalance
+                    max_iter=1000,
+                    C=1.0,
+                    class_weight="balanced",
+                    random_state=42,  # Handle class imbalance
                 ),
             ),
         ]
@@ -69,7 +74,9 @@ def train():
 
     # Feature importance (coefficients)
     coefs = pipeline.named_steps["classifier"].coef_[0]
-    feature_importance = sorted(zip(FEATURE_COLS, coefs), key=lambda x: abs(x[1]), reverse=True)
+    feature_importance = sorted(
+        zip(FEATURE_COLS, coefs), key=lambda x: abs(x[1]), reverse=True
+    )
     print("\n=== Feature Importance ===")
     for feat, coef in feature_importance:
         print(f"  {feat:35s}: {coef:+.3f}")
