@@ -2,22 +2,22 @@
 SentinelOps Repository Management Router
 Author: Arsh Verma
 """
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+
 from app.core.database import get_db
 from app.models.repository import Repository
+from fastapi import APIRouter, Depends
+from sqlalchemy import desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
+
 
 @router.get("/")
 async def list_repositories(db: AsyncSession = Depends(get_db)):
     """List all monitored repositories."""
-    result = await db.execute(
-        select(Repository).order_by(desc(Repository.risk_score))
-    )
+    result = await db.execute(select(Repository).order_by(desc(Repository.risk_score)))
     repos = result.scalars().all()
-    
+
     return [
         {
             "id": r.id,

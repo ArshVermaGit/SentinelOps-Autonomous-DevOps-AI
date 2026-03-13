@@ -3,20 +3,22 @@ Local Git Service - Multi-repo aware. Detects changes, runs health checks,
 and handles commit/push for any linked repository.
 Author: Arsh Verma
 """
-import subprocess
-import os
+
 import json
-from typing import Dict, List, Any
-from app.services.risk_analyzer import RiskAnalyzer
-from app.utils.diff_parser import parse_unified_diff
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
-from app.models.repository import Repository
-from app.models.pull_request import PullRequest
+import logging
+import os
+import subprocess
+from datetime import datetime
+from typing import Any, Dict, List
+
 from app.models.ci_run import CIRun
 from app.models.incident import Incident
-from datetime import datetime
-import logging
+from app.models.pull_request import PullRequest
+from app.models.repository import Repository
+from app.services.risk_analyzer import RiskAnalyzer
+from app.utils.diff_parser import parse_unified_diff
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +50,7 @@ class LocalGitService:
         """Run a git command in a specific repo directory."""
         try:
             result = subprocess.run(
-                ["git", "-C", repo_path] + args,
-                capture_output=True, text=True, check=True, timeout=15
+                ["git", "-C", repo_path] + args, capture_output=True, text=True, check=True, timeout=15
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -147,11 +148,15 @@ class LocalGitService:
                 parts = line.split()
                 for part in parts:
                     if part.startswith("+"):
-                        try: ahead = int(part[1:])
-                        except ValueError: pass
+                        try:
+                            ahead = int(part[1:])
+                        except ValueError:
+                            pass
                     elif part.startswith("-"):
-                        try: behind = abs(int(part[1:]))
-                        except ValueError: pass
+                        try:
+                            behind = abs(int(part[1:]))
+                        except ValueError:
+                            pass
 
         if ahead > 0 and behind > 0:
             state = "diverged"
@@ -173,8 +178,7 @@ class LocalGitService:
             # Node.js project — try lint
             try:
                 result = subprocess.run(
-                    ["npm", "run", "lint", "--silent"],
-                    cwd=repo_path, capture_output=True, text=True, timeout=60
+                    ["npm", "run", "lint", "--silent"], cwd=repo_path, capture_output=True, text=True, timeout=60
                 )
                 if result.returncode != 0:
                     for line in result.stderr.splitlines() + result.stdout.splitlines():
@@ -184,13 +188,13 @@ class LocalGitService:
             except (subprocess.TimeoutExpired, FileNotFoundError):
                 pass
 
-        elif os.path.isfile(os.path.join(repo_path, "requirements.txt")) or \
-             os.path.isfile(os.path.join(repo_path, "pyproject.toml")):
+        elif os.path.isfile(os.path.join(repo_path, "requirements.txt")) or os.path.isfile(
+            os.path.join(repo_path, "pyproject.toml")
+        ):
             # Python project — try syntax check
             try:
                 result = subprocess.run(
-                    ["python3", "-m", "py_compile", "--help"],
-                    cwd=repo_path, capture_output=True, text=True, timeout=10
+                    ["python3", "-m", "py_compile", "--help"], cwd=repo_path, capture_output=True, text=True, timeout=10
                 )
             except (subprocess.TimeoutExpired, FileNotFoundError):
                 pass
@@ -215,15 +219,18 @@ class LocalGitService:
             has_dep = any(f["is_dep"] for f in diff_info["files"])
             has_test = any(f["is_test"] for f in diff_info["files"])
 
-            result = self.analyzer.analyze_pr({
-                "lines_added": sum(f.get("additions", 0) for f in diff_info["files"]),
-                "lines_deleted": sum(f.get("deletions", 0) for f in diff_info["files"]),
-                "files_changed": len(diff_info["files"]),
-                "has_config_changes": has_config,
-                "has_dependency_changes": has_dep,
-                "has_test_changes": has_test,
-                "complexity_delta": diff_info["max_complexity_delta"],
-            }, {"total_prs": 10, "failed_prs": 1})
+            result = self.analyzer.analyze_pr(
+                {
+                    "lines_added": sum(f.get("additions", 0) for f in diff_info["files"]),
+                    "lines_deleted": sum(f.get("deletions", 0) for f in diff_info["files"]),
+                    "files_changed": len(diff_info["files"]),
+                    "has_config_changes": has_config,
+                    "has_dependency_changes": has_dep,
+                    "has_test_changes": has_test,
+                    "complexity_delta": diff_info["max_complexity_delta"],
+                },
+                {"total_prs": 10, "failed_prs": 1},
+            )
             return result
         except Exception as e:
             logger.warning(f"Risk calc failed: {e}")
@@ -234,7 +241,7 @@ class LocalGitService:
     def stage_all(self, repo_path: str) -> bool:
         """Stage all changes in a repo."""
         repo_path = os.path.expanduser(repo_path)
-        output = self._run_git(repo_path, ["add", "-A"])
+        self._run_git(repo_path, ["add", "-A"])
         return True  # git add -A doesn't fail unless path is bad
 
     async def sync_repositories(self, db: AsyncSession) -> None:
@@ -244,38 +251,38 @@ class LocalGitService:
             path = repo_cfg["local_path"]
             name = repo_cfg["name"]
             status = self.get_repo_status(path)
-            
+
             # 1. Update Repository Record
             res = await db.execute(select(Repository).where(Repository.url == path))
             repo = res.scalar_one_or_none()
-            
+
             if not repo:
                 repo = Repository(
                     name=name,
                     full_name=f"local/{name}",
                     url=path,
-                    github_id=hash(path) % 1000000 # Deterministic mock ID
+                    github_id=hash(path) % 1000000,  # Deterministic mock ID
                 )
                 db.add(repo)
                 await db.flush()
-            
+
             repo.risk_score = status["risk"]["risk_probability"]
             repo.last_analyzed = datetime.utcnow()
-            
+
             # 2. Sync 'Local PR' (Uncommitted changes)
             staged_count = len(status["changed_files"]["staged"])
             modified_count = len(status["changed_files"]["modified"])
-            
+
             if staged_count > 0 or modified_count > 0:
                 # Find or create a 'Local Changes' PR record
                 pr_res = await db.execute(
                     select(PullRequest).where(
                         PullRequest.repo_id == repo.id,
-                        PullRequest.github_pr_number == 0 # Identifier for local changes
+                        PullRequest.github_pr_number == 0,  # Identifier for local changes
                     )
                 )
                 pr = pr_res.scalar_one_or_none()
-                
+
                 if not pr:
                     pr = PullRequest(
                         repo_id=repo.id,
@@ -283,11 +290,11 @@ class LocalGitService:
                         title=f"Local Changes: {name}",
                         author="You (Local)",
                         head_branch=status["branch"],
-                        status="open"
+                        status="open",
                     )
                     db.add(pr)
                     await db.flush()
-                
+
                 pr.lines_added = status["risk"].get("lines_added", 0)
                 pr.lines_deleted = status["risk"].get("lines_deleted", 0)
                 pr.files_changed = staged_count + modified_count
@@ -305,20 +312,20 @@ class LocalGitService:
                     status="failure",
                     started_at=datetime.utcnow(),
                     finished_at=datetime.utcnow(),
-                    log_text="\n".join(status["health"]["errors"])
+                    log_text="\n".join(status["health"]["errors"]),
                 )
                 db.add(run)
                 await db.flush()
-                
+
                 # Create an Incident
                 incident = Incident(
                     ci_run_id=run.id,
                     root_cause=f"Local health check failed in {name}",
                     error_category="lint" if "npm" in status["health"]["errors"][0] else "syntax",
-                    status="open"
+                    status="open",
                 )
                 db.add(incident)
-            
+
             await db.commit()
 
     def commit_and_push(self, repo_path: str, message: str) -> Dict[str, Any]:
@@ -338,7 +345,7 @@ class LocalGitService:
             return {"success": False, "error": "Nothing to commit or commit failed"}
 
         # Push
-        push_out = self._run_git(repo_path, ["push"])
+        self._run_git(repo_path, ["push"])
         return {"success": True, "message": "Changes committed and pushed to GitHub"}
 
 

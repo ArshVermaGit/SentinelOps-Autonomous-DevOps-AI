@@ -1,11 +1,14 @@
-from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel
+
 
 class PullRequestBase(BaseModel):
     title: str
     author: str
     head_branch: str
+
 
 class PullRequestResponse(PullRequestBase):
     id: int
@@ -28,6 +31,7 @@ class PullRequestResponse(PullRequestBase):
     class Config:
         from_attributes = True
 
+
 class PRRiskAnalysisRequest(BaseModel):
     title: str
     lines_added: int = 0
@@ -38,6 +42,7 @@ class PRRiskAnalysisRequest(BaseModel):
     has_dependency_changes: bool = False
     author_failure_rate: float = 0.15
     complexity_delta: float = 0.0
+
 
 class PRRiskAnalysisResponse(BaseModel):
     risk_probability: float

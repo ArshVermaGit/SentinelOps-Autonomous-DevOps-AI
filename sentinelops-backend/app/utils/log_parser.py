@@ -1,8 +1,8 @@
 """
 Utilities for parsing CI/CD log output.
 """
-import re
 
+import re
 
 # Common error patterns across CI providers
 ERROR_PATTERNS = [
@@ -60,8 +60,7 @@ def extract_error_block(log_text: str, context_lines: int = 30) -> str:
 
     # Expand backward to include full stack trace if applicable
     context_slice = lines[start:last_error_idx]
-    if any("Traceback" in line_txt or "at " in line_txt
-           for line_txt in context_slice):
+    if any("Traceback" in line_txt or "at " in line_txt for line_txt in context_slice):
         traceback_start = start
         lookback_limit = max(0, last_error_idx - 40)
         for i in range(last_error_idx, lookback_limit, -1):
@@ -103,9 +102,7 @@ def detect_flaky_test(run_logs: list[str]) -> bool:
 
 
 def detect_anomalous_build_time(
-    current_duration_ms: int,
-    historical_durations: list[int],
-    std_multiplier: float = 2.0
+    current_duration_ms: int, historical_durations: list[int], std_multiplier: float = 2.0
 ) -> bool:
     """
     Returns True if current build time is anomalously high or low.
@@ -115,6 +112,7 @@ def detect_anomalous_build_time(
         return False  # Not enough data
 
     import statistics
+
     mean = statistics.mean(historical_durations)
     stdev = statistics.stdev(historical_durations)
 
@@ -127,6 +125,7 @@ def detect_anomalous_build_time(
 def extract_file_types(filenames: list[str]) -> list[str]:
     """Extract unique file extensions from a list of filenames."""
     import os
+
     extensions = set()
     for f in filenames:
         _, ext = os.path.splitext(f)
@@ -138,8 +137,18 @@ def extract_file_types(filenames: list[str]) -> list[str]:
 def is_config_file(filename: str) -> bool:
     """Check if a file is a configuration file."""
     config_patterns = [
-        ".yaml", ".yml", ".json", ".toml", ".ini", ".env", ".cfg",
-        "dockerfile", "docker-compose", ".tf", ".tfvars", "makefile"
+        ".yaml",
+        ".yml",
+        ".json",
+        ".toml",
+        ".ini",
+        ".env",
+        ".cfg",
+        "dockerfile",
+        "docker-compose",
+        ".tf",
+        ".tfvars",
+        "makefile",
     ]
     lower = filename.lower()
     return any(p in lower for p in config_patterns)
@@ -148,18 +157,26 @@ def is_config_file(filename: str) -> bool:
 def is_dependency_file(filename: str) -> bool:
     """Check if a file is a dependency manifest."""
     dep_files = [
-        "package.json", "package-lock.json", "yarn.lock",
-        "requirements.txt", "pyproject.toml", "setup.py", "Pipfile",
-        "go.mod", "go.sum", "Cargo.toml", "Cargo.lock",
-        "pom.xml", "build.gradle", "Gemfile"
+        "package.json",
+        "package-lock.json",
+        "yarn.lock",
+        "requirements.txt",
+        "pyproject.toml",
+        "setup.py",
+        "Pipfile",
+        "go.mod",
+        "go.sum",
+        "Cargo.toml",
+        "Cargo.lock",
+        "pom.xml",
+        "build.gradle",
+        "Gemfile",
     ]
     return any(filename.endswith(d) or filename == d for d in dep_files)
 
 
 def is_test_file(filename: str) -> bool:
     """Check if a file is a test file."""
-    test_patterns = [
-        "test_", "_test.", ".test.", ".spec.", "/tests/", "/test/", "__tests__"
-    ]
+    test_patterns = ["test_", "_test.", ".test.", ".spec.", "/tests/", "/test/", "__tests__"]
     lower = filename.lower()
     return any(p in lower for p in test_patterns)

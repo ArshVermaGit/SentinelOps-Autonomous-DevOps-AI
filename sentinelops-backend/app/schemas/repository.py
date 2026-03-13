@@ -1,11 +1,14 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel
+
 
 class RepositoryBase(BaseModel):
     name: str
     full_name: str
     url: str
+
 
 class RepositoryResponse(RepositoryBase):
     id: int

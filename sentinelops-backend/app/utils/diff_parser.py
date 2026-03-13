@@ -2,6 +2,7 @@
 Advanced Git diff parsing utilities for SentinelOps.
 Extracts filename-level changes, line counts, and calculates complexity deltas.
 """
+
 import re
 from typing import Any, Dict, List
 
@@ -33,9 +34,17 @@ def parse_unified_diff(diff_text: str) -> Dict[str, Any]:
 
     # Heuristic for complexity: search for control flow keywords in added lines
     complexity_keywords = [
-        r'\bif\b', r'\bfor\b', r'\bwhile\b', r'\bswitch\b', r'\bcase\b',
-        r'\btry\b', r'\bcatch\b', r'\bawait\b', r'\basync\b', r'\bdef\b',
-        r'\bfunction\b'
+        r"\bif\b",
+        r"\bfor\b",
+        r"\bwhile\b",
+        r"\bswitch\b",
+        r"\bcase\b",
+        r"\btry\b",
+        r"\bcatch\b",
+        r"\bawait\b",
+        r"\basync\b",
+        r"\bdef\b",
+        r"\bfunction\b",
     ]
     complexity_regex = re.compile("|".join(complexity_keywords))
 
@@ -55,7 +64,7 @@ def parse_unified_diff(diff_text: str) -> Dict[str, Any]:
                 "complexity_delta": 0.0,
                 "is_config": _is_config(path),
                 "is_test": _is_test(path),
-                "is_dep": _is_dep(path)
+                "is_dep": _is_dep(path),
             }
 
         elif current_file:
@@ -76,25 +85,28 @@ def parse_unified_diff(diff_text: str) -> Dict[str, Any]:
         "total_additions": sum(f["additions"] for f in files),
         "total_deletions": sum(f["deletions"] for f in files),
         "total_files": len(files),
-        "max_complexity_delta": max_comp
+        "max_complexity_delta": max_comp,
     }
 
 
 def _is_config(path: str) -> bool:
     """Check if file is a configuration file."""
     from app.utils.log_parser import is_config_file
+
     return is_config_file(path)
 
 
 def _is_test(path: str) -> bool:
     """Check if file is a test file."""
     from app.utils.log_parser import is_test_file
+
     return is_test_file(path)
 
 
 def _is_dep(path: str) -> bool:
     """Check if file is a dependency manifest."""
     from app.utils.log_parser import is_dependency_file
+
     return is_dependency_file(path)
 
 

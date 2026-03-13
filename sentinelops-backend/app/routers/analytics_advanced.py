@@ -3,15 +3,16 @@ SentinelOps Advanced Analytics Router
 Provides real data-driven analytics endpoints for MTTR, churn correlation, etc.
 Author: Arsh Verma
 """
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, desc
+
+from datetime import datetime, timedelta
+
 from app.core.database import get_db
 from app.models.incident import Incident
-from app.models.ci_run import CIRun
 from app.models.pull_request import PullRequest
 from app.models.repository import Repository
-from datetime import datetime, timedelta
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import desc, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -25,11 +26,7 @@ async def get_mttr_analytics(days: int = Query(default=30, le=90), db: AsyncSess
     start = datetime.utcnow() - timedelta(days=days)
 
     # Get all incidents in timeframe
-    result = await db.execute(
-        select(Incident)
-        .where(Incident.created_at >= start)
-        .order_by(Incident.created_at)
-    )
+    result = await db.execute(select(Incident).where(Incident.created_at >= start).order_by(Incident.created_at))
     incidents = result.scalars().all()
 
     # For resolved incidents, calculate resolution time from created_at to simulation/resolution
@@ -67,11 +64,13 @@ async def get_mttr_analytics(days: int = Query(default=30, le=90), db: AsyncSess
     mttr_trend = []
     for day_data in sorted(daily_mttr.values(), key=lambda x: x["date"]):
         avg = day_data["total_mins"] / max(day_data["count"], 1)
-        mttr_trend.append({
-            "date": day_data["date"],
-            "mttr_minutes": round(avg, 1),
-            "incidents": day_data["count"],
-        })
+        mttr_trend.append(
+            {
+                "date": day_data["date"],
+                "mttr_minutes": round(avg, 1),
+                "incidents": day_data["count"],
+            }
+        )
 
     overall_mttr_mins = total_resolution_mins / max(resolved_count, 1)
     hours = int(overall_mttr_mins // 60)
@@ -92,22 +91,22 @@ async def get_churn_correlation(db: AsyncSession = Depends(get_db)):
     Return code churn vs CI failure rate — scatter plot data.
     Each data point is a PR with its lines changed and whether its CI runs failed.
     """
-    result = await db.execute(
-        select(PullRequest).order_by(desc(PullRequest.created_at)).limit(50)
-    )
+    result = await db.execute(select(PullRequest).order_by(desc(PullRequest.created_at)).limit(50))
     prs = result.scalars().all()
 
     data_points = []
     for pr in prs:
         lines_changed = (pr.lines_added or 0) + (pr.lines_deleted or 0)
-        data_points.append({
-            "id": pr.id,
-            "title": pr.title,
-            "lines": lines_changed,
-            "failure_rate": round(pr.risk_probability or 0, 2),
-            "risk_level": pr.risk_level,
-            "author": pr.author,
-        })
+        data_points.append(
+            {
+                "id": pr.id,
+                "title": pr.title,
+                "lines": lines_changed,
+                "failure_rate": round(pr.risk_probability or 0, 2),
+                "risk_level": pr.risk_level,
+                "author": pr.author,
+            }
+        )
 
     return {"data": data_points}
 
@@ -129,9 +128,7 @@ async def get_deployment_stability(db: AsyncSession = Depends(get_db)):
             }
             for r in repos
         ],
-        "overall_stability": round(
-            sum(r.deployment_stability or 0 for r in repos) / max(len(repos), 1) * 100, 1
-        ),
+        "overall_stability": round(sum(r.deployment_stability or 0 for r in repos) / max(len(repos), 1) * 100, 1),
     }
 
 
@@ -141,9 +138,7 @@ async def get_incidents_explained_ratio(db: AsyncSession = Depends(get_db)):
     total_result = await db.execute(select(func.count(Incident.id)))
     total = total_result.scalar() or 0
 
-    explained_result = await db.execute(
-        select(func.count(Incident.id)).where(Incident.root_cause.isnot(None))
-    )
+    explained_result = await db.execute(select(func.count(Incident.id)).where(Incident.root_cause.isnot(None)))
     explained = explained_result.scalar() or 0
 
     return {

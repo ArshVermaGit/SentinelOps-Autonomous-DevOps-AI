@@ -1,10 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel
+
 
 class IncidentBase(BaseModel):
     root_cause: Optional[str] = None
     error_category: Optional[str] = None
+
 
 class IncidentResponse(IncidentBase):
     id: int
@@ -24,10 +27,12 @@ class IncidentResponse(IncidentBase):
     class Config:
         from_attributes = True
 
+
 class SimulationStep(BaseModel):
     step: str
     status: str  # "success" | "failure" | "skipped" | "running"
     duration_ms: int
+
 
 class SimulationResult(BaseModel):
     success: bool

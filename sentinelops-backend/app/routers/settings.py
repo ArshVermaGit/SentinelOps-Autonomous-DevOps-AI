@@ -2,14 +2,15 @@
 SentinelOps Settings Router
 Author: Arsh Verma
 """
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+
+
 from app.core.database import get_db
-from app.models.repository import Repository
 from app.models.notification import Notification
+from app.models.repository import Repository
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from typing import Optional
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -17,9 +18,7 @@ router = APIRouter()
 @router.get("/")
 async def get_settings(db: AsyncSession = Depends(get_db)):
     """Return current platform settings and monitored repositories."""
-    repos_result = await db.execute(
-        select(Repository).order_by(Repository.name)
-    )
+    repos_result = await db.execute(select(Repository).order_by(Repository.name))
     repos = repos_result.scalars().all()
 
     return {
@@ -55,7 +54,7 @@ async def get_settings(db: AsyncSession = Depends(get_db)):
 @router.get("/notifications")
 async def get_notifications(
     limit: int = 20,
-    status: Optional[str] = None,
+    status: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     """Return recent notifications."""
@@ -92,21 +91,15 @@ class NotificationMarkRead(BaseModel):
 
 
 @router.post("/notifications/read")
-async def mark_notifications_read(
-    req: NotificationMarkRead, db: AsyncSession = Depends(get_db)
-):
+async def mark_notifications_read(req: NotificationMarkRead, db: AsyncSession = Depends(get_db)):
     """Mark notifications as read."""
     if req.mark_all:
-        result = await db.execute(
-            select(Notification).where(Notification.is_read == "unread")
-        )
+        result = await db.execute(select(Notification).where(Notification.is_read == "unread"))
         for n in result.scalars().all():
             n.is_read = "read"
     else:
         for nid in req.ids:
-            result = await db.execute(
-                select(Notification).where(Notification.id == nid)
-            )
+            result = await db.execute(select(Notification).where(Notification.id == nid))
             n = result.scalar_one_or_none()
             if n:
                 n.is_read = "read"
@@ -123,6 +116,7 @@ async def toggle_repository(repo_id: int, db: AsyncSession = Depends(get_db)):
 
     if not repo:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="Repository not found")
 
     repo.is_active = not repo.is_active

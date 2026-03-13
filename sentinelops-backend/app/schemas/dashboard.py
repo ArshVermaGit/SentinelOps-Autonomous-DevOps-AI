@@ -1,10 +1,13 @@
+from typing import List
+
 from pydantic import BaseModel
-from typing import List, Optional
+
 
 class RepoSummary(BaseModel):
     total: int
     high_risk: int
     avg_risk_score: float
+
 
 class CISummary(BaseModel):
     total_runs_30d: int
@@ -12,9 +15,11 @@ class CISummary(BaseModel):
     success_rate: float
     avg_build_time_ms: int
 
+
 class IncidentSummary(BaseModel):
     open: int
     total_30d: int
+
 
 class RepoListItem(BaseModel):
     id: int
@@ -22,11 +27,13 @@ class RepoListItem(BaseModel):
     risk_score: float
     failure_rate: float
 
+
 class DashboardSummaryResponse(BaseModel):
     repos: RepoSummary
     ci: CISummary
     incidents: IncidentSummary
     repos_list: List[RepoListItem]
+
 
 class CIHealthDataPoint(BaseModel):
     date: str
@@ -35,14 +42,17 @@ class CIHealthDataPoint(BaseModel):
     total: int
     avg_duration: int
 
+
 class CIHealthResponse(BaseModel):
     data: List[CIHealthDataPoint]
+
 
 class RiskHeatmapRepo(BaseModel):
     id: int
     name: str
     risk_score: float
     risk_level: str
+
 
 class RiskHeatmapPR(BaseModel):
     id: int
@@ -51,6 +61,7 @@ class RiskHeatmapPR(BaseModel):
     risk_probability: float
     risk_level: str
     risk_factors: List[str] = []
+
 
 class RiskHeatmapResponse(BaseModel):
     repositories: List[RiskHeatmapRepo]

@@ -1,10 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel
+
 
 class CIRunBase(BaseModel):
     workflow_name: str
     status: str
+
 
 class CIRunResponse(CIRunBase):
     id: int

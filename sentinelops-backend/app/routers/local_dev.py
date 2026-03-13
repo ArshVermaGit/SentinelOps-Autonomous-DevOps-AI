@@ -2,10 +2,11 @@
 Local Development Router - Multi-repo management endpoints.
 Author: Arsh Verma
 """
+
+
+from app.services.local_git_service import local_git
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional
-from app.services.local_git_service import local_git
 
 router = APIRouter()
 
@@ -33,8 +34,7 @@ async def link_repo(req: LinkRepoRequest):
     success = local_git.link_repo(req.name, req.local_path, req.github_url)
     if not success:
         raise HTTPException(
-            status_code=400,
-            detail="Invalid path — no .git directory found. Make sure the folder is a git repo."
+            status_code=400, detail="Invalid path — no .git directory found. Make sure the folder is a git repo."
         )
     return {"status": "linked", "name": req.name, "local_path": req.local_path}
 
@@ -73,16 +73,18 @@ async def get_legacy_status():
         return {"has_changes": False, "risk": None}
     first = repos[0]
     status = local_git.get_repo_status(first["local_path"])
-    has_changes = len(status.get("changed_files", {}).get("staged", [])) > 0 or \
-                  len(status.get("changed_files", {}).get("modified", [])) > 0
+    has_changes = (
+        len(status.get("changed_files", {}).get("staged", [])) > 0
+        or len(status.get("changed_files", {}).get("modified", [])) > 0
+    )
     return {
         "has_changes": has_changes,
         "diff_summary": {
-            "files_count": len(status.get("changed_files", {}).get("staged", [])) +
-                          len(status.get("changed_files", {}).get("modified", [])),
-            "max_complexity": 0
+            "files_count": len(status.get("changed_files", {}).get("staged", []))
+            + len(status.get("changed_files", {}).get("modified", [])),
+            "max_complexity": 0,
         },
-        "risk": status.get("risk")
+        "risk": status.get("risk"),
     }
 
 
