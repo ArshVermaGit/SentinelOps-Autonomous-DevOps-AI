@@ -1,7 +1,16 @@
 from datetime import datetime
 
 from app.core.database import Base
-from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 
@@ -15,7 +24,9 @@ class CIRun(Base):
 
     # Run metadata
     workflow_name = Column(String, nullable=False)
-    status = Column(String, nullable=False)  # "success" | "failure" | "running" | "cancelled"
+    status = Column(
+        String, nullable=False
+    )  # "success" | "failure" | "running" | "cancelled"
     conclusion = Column(String, nullable=True)
 
     # Timing
