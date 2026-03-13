@@ -27,7 +27,9 @@ def generate_training_data(n: int = N) -> pd.DataFrame:
 
         has_config = np.random.choice([0, 1], p=[0.75, 0.25])
         has_tests = np.random.choice([0, 1], p=[0.40, 0.60])  # Most PRs have tests
-        author_failure_rate = np.random.beta(2, 5)  # Right-skewed: most authors reliable
+        author_failure_rate = np.random.beta(
+            2, 5
+        )  # Right-skewed: most authors reliable
         pr_age_hours = np.random.exponential(scale=24)
         is_large = 1 if lines_changed > 500 else 0
         has_deps = np.random.choice([0, 1], p=[0.70, 0.30])
