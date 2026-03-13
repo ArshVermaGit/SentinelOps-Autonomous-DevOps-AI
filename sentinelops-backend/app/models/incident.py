@@ -14,7 +14,9 @@ class Incident(Base):
     # LLM Root Cause Analysis
     root_cause = Column(Text, nullable=True)
     responsible_files = Column(JSON, default=list)
-    error_category = Column(String, nullable=True)  # "dependency|syntax|test|config|runtime|network"
+    error_category = Column(
+        String, nullable=True
+    )  # "dependency|syntax|test|config|runtime|network"
     llm_confidence = Column(Float, default=0.0)
 
     # Fix suggestion
