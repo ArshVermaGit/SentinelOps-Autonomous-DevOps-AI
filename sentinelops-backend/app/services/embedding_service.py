@@ -17,7 +17,9 @@ def _get_model():
 
             _model = SentenceTransformer("all-MiniLM-L6-v2")
         except ImportError:
-            print("WARNING: sentence-transformers not installed. Using mock embeddings.")
+            print(
+                "WARNING: sentence-transformers not installed. Using mock embeddings."
+            )
             _model = "mock"
     return _model
 
@@ -48,7 +50,9 @@ def cosine_similarity(a: list, b: list) -> float:
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
 
-async def find_similar_incidents(db, log_text: str, threshold: float = 0.7, limit: int = 3) -> list[dict]:
+async def find_similar_incidents(
+    db, log_text: str, threshold: float = 0.7, limit: int = 3
+) -> list[dict]:
     """Find similar past incidents using embedding similarity."""
     from app.models.log_embedding import LogEmbedding
     from sqlalchemy import select
@@ -65,7 +69,11 @@ async def find_similar_incidents(db, log_text: str, threshold: float = 0.7, limi
         sim = cosine_similarity(new_embedding, stored_emb.embedding_vector)
         if sim >= threshold:
             similarities.append(
-                {"embedding_id": stored_emb.id, "ci_run_id": stored_emb.ci_run_id, "similarity_score": sim}
+                {
+                    "embedding_id": stored_emb.id,
+                    "ci_run_id": stored_emb.ci_run_id,
+                    "similarity_score": sim,
+                }
             )
 
     # Sort by similarity descending
