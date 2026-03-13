@@ -16,7 +16,9 @@ from sqlalchemy import func, select
 async def _poll_and_update():
     async with AsyncSessionLocal() as session:
         # 1. Fetch all active repos
-        result = await session.execute(select(Repository).where(Repository.is_active.is_(True)))
+        result = await session.execute(
+            select(Repository).where(Repository.is_active.is_(True))
+        )
         repos = result.scalars().all()
 
         thirty_days_ago = datetime.utcnow() - timedelta(days=30)
