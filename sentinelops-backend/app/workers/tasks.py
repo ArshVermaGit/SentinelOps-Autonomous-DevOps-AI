@@ -65,7 +65,9 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
         )
 
         diff_text = await gh.get_pr_diff(repo_full_name, pr_id)
-        author_stats = await gh.get_author_stats(repo_full_name, pr_data["user"]["login"])
+        author_stats = await gh.get_author_stats(
+            repo_full_name, pr_data["user"]["login"]
+        )
 
         # Parse diff for advanced features
         diff_info = parse_unified_diff(diff_text)
@@ -91,10 +93,18 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
 
         # 2. Report FINAL status based on risk level
         state = "success" if result["risk_level"] != "high" else "failure"
-        description = "Merge risk is low/moderate." if state == "success" else "High risk detected! Review analysis."
+        description = (
+            "Merge risk is low/moderate."
+            if state == "success"
+            else "High risk detected! Review analysis."
+        )
 
         await gh.create_commit_status(
-            repo_full_name, head_sha, state, description, target_url=f"{settings.FRONTEND_URL}/dashboard"
+            repo_full_name,
+            head_sha,
+            state,
+            description,
+            target_url=f"{settings.FRONTEND_URL}/dashboard",
         )
 
         # 3. Post humanized PR comment for transparency
@@ -102,7 +112,9 @@ async def _analyze_pr(pr_id: int, repo_full_name: str):
         await gh.create_pr_comment(repo_full_name, pr_id, comment_body)
 
         # Store or update PR in DB
-        res = await db.execute(select(PullRequest).where(PullRequest.github_pr_number == pr_id))
+        res = await db.execute(
+            select(PullRequest).where(PullRequest.github_pr_number == pr_id)
+        )
         db_pr = res.scalar_one_or_none()
 
         if not db_pr:
@@ -173,7 +185,9 @@ async def _analyze_ci_run(run_id: int, repo_full_name: str):
         db.add(incident)
 
         # Store log embedding for future similarity searches
-        embedding = LogEmbedding(ci_run_id=ci_run.id, embedding_vector=embed_log(log_text))
+        embedding = LogEmbedding(
+            ci_run_id=ci_run.id, embedding_vector=embed_log(log_text)
+        )
         db.add(embedding)
 
         await db.commit()
@@ -197,7 +211,12 @@ async def _update_all_repo_health():
 
         for repo in repos:
             # Query recent CI runs for this repo
-            runs_query = select(CIRun).where(CIRun.repo_id == repo.id).order_by(CIRun.created_at.desc()).limit(100)
+            runs_query = (
+                select(CIRun)
+                .where(CIRun.repo_id == repo.id)
+                .order_by(CIRun.created_at.desc())
+                .limit(100)
+            )
             res = await db.execute(runs_query)
             runs = res.scalars().all()
 
@@ -215,7 +234,9 @@ async def _update_all_repo_health():
                 repo.avg_build_time_ms = int(sum(durations) / len(durations))
 
             # Composite risk score (simplified)
-            repo.risk_score = min(1.0, (repo.failure_rate * 2.0) + (repo.avg_build_time_ms / 600000))
+            repo.risk_score = min(
+                1.0, (repo.failure_rate * 2.0) + (repo.avg_build_time_ms / 600000)
+            )
             repo.deployment_stability = 1.0 - repo.failure_rate
 
         await db.commit()
