@@ -69,7 +69,11 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}")
     logger.error(traceback.format_exc())
     return JSONResponse(
-        status_code=500, content={"detail": "An internal server error occurred.", "type": exc.__class__.__name__}
+        status_code=500,
+        content={
+            "detail": "An internal server error occurred.",
+            "type": exc.__class__.__name__,
+        },
     )
 
 
@@ -84,14 +88,20 @@ app.add_middleware(
 
 # Register all routers
 app.include_router(webhooks.router, prefix="/api/webhooks", tags=["Webhooks"])
-app.include_router(repositories.router, prefix="/api/repositories", tags=["Repositories"])
-app.include_router(pull_requests.router, prefix="/api/pull-requests", tags=["Pull Requests"])
+app.include_router(
+    repositories.router, prefix="/api/repositories", tags=["Repositories"]
+)
+app.include_router(
+    pull_requests.router, prefix="/api/pull-requests", tags=["Pull Requests"]
+)
 app.include_router(incidents.router, prefix="/api/incidents", tags=["Incidents"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
 app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
 app.include_router(simulation.router, prefix="/api/simulation", tags=["Simulation"])
 app.include_router(settings_router.router, prefix="/api/settings", tags=["Settings"])
-app.include_router(analytics_advanced.router, prefix="/api/analytics", tags=["Analytics"])
+app.include_router(
+    analytics_advanced.router, prefix="/api/analytics", tags=["Analytics"]
+)
 app.include_router(local_dev.router, prefix="/api/local", tags=["Local Dev"])
 
 
