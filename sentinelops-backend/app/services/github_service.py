@@ -29,7 +29,9 @@ class GitHubService:
         async with httpx.AsyncClient() as client:
             try:
                 r = await client.get(
-                    f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}", headers=self.headers, timeout=10.0
+                    f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}",
+                    headers=self.headers,
+                    timeout=10.0,
                 )
                 r.raise_for_status()
                 return r.json()
@@ -56,7 +58,9 @@ class GitHubService:
         """Get list of files changed in PR."""
         async with httpx.AsyncClient() as client:
             r = await client.get(
-                f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}/files", headers=self.headers, timeout=10.0
+                f"{GITHUB_API_BASE}/repos/{repo}/pulls/{pr_number}/files",
+                headers=self.headers,
+                timeout=10.0,
             )
             r.raise_for_status()
             return r.json()
@@ -69,7 +73,9 @@ class GitHubService:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             # Get download URL
             r = await client.get(
-                f"{GITHUB_API_BASE}/repos/{repo}/actions/runs/{run_id}/logs", headers=self.headers, timeout=30.0
+                f"{GITHUB_API_BASE}/repos/{repo}/actions/runs/{run_id}/logs",
+                headers=self.headers,
+                timeout=30.0,
             )
             if r.status_code == 302:
                 # Follow redirect to download
@@ -86,7 +92,9 @@ class GitHubService:
         """Get workflow run details."""
         async with httpx.AsyncClient() as client:
             r = await client.get(
-                f"{GITHUB_API_BASE}/repos/{repo}/actions/runs/{run_id}", headers=self.headers, timeout=10.0
+                f"{GITHUB_API_BASE}/repos/{repo}/actions/runs/{run_id}",
+                headers=self.headers,
+                timeout=10.0,
             )
             r.raise_for_status()
             return r.json()
@@ -99,7 +107,10 @@ class GitHubService:
         async with httpx.AsyncClient() as client:
             r = await client.get(
                 f"{GITHUB_API_BASE}/search/issues",
-                params={"q": f"repo:{repo} author:{author} type:pr is:closed", "per_page": 100},
+                params={
+                    "q": f"repo:{repo} author:{author} type:pr is:closed",
+                    "per_page": 100,
+                },
                 headers=self.headers,
                 timeout=10.0,
             )
@@ -143,7 +154,10 @@ class GitHubService:
                     "context": "sentinel-ops/risk-gate",
                 }
                 r = await client.post(
-                    f"{GITHUB_API_BASE}/repos/{repo}/statuses/{sha}", headers=self.headers, json=payload, timeout=10.0
+                    f"{GITHUB_API_BASE}/repos/{repo}/statuses/{sha}",
+                    headers=self.headers,
+                    json=payload,
+                    timeout=10.0,
                 )
                 r.raise_for_status()
                 return r.json()
@@ -153,7 +167,11 @@ class GitHubService:
 
     def format_pr_risk_comment(self, risk_data: Dict[str, Any]) -> str:
         """Helper to format the PR risk analysis as a clean markdown comment."""
-        emoji = "🟢" if risk_data["risk_level"] == "safe" else "🟡" if risk_data["risk_level"] == "caution" else "🔴"
+        emoji = (
+            "🟢"
+            if risk_data["risk_level"] == "safe"
+            else "🟡" if risk_data["risk_level"] == "caution" else "🔴"
+        )
 
         factors_md = "\n".join([f"- {f}" for f in risk_data.get("risk_factors", [])])
 
