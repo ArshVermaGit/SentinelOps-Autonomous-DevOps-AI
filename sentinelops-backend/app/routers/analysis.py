@@ -37,7 +37,12 @@ async def analyze_pr_manual(req: PRAnalysisRequest):
 
     # Rule-based risk analysis
     rule_result = risk_analyzer.analyze_pr(
-        pr_data, {"total_prs": 50, "failed_prs": int(req.author_failure_rate * 50), "avg_lines_changed": 200}
+        pr_data,
+        {
+            "total_prs": 50,
+            "failed_prs": int(req.author_failure_rate * 50),
+            "avg_lines_changed": 200,
+        },
     )
 
     # ML model prediction
@@ -47,7 +52,11 @@ async def analyze_pr_manual(req: PRAnalysisRequest):
     # Blend: 60% ML, 40% rule-based
     final_probability = 0.6 * ml_probability + 0.4 * rule_result["risk_probability"]
 
-    risk_level = "safe" if final_probability < 0.35 else "caution" if final_probability < 0.65 else "high"
+    risk_level = (
+        "safe"
+        if final_probability < 0.35
+        else "caution" if final_probability < 0.65 else "high"
+    )
 
     return {
         "risk_probability": round(final_probability, 3),
