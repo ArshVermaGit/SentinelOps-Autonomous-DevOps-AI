@@ -22,7 +22,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
-REPOS_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "linked_repos.json")
+REPOS_CONFIG_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "..", "linked_repos.json"
+)
 
 
 def _load_linked_repos() -> List[Dict[str, str]]:
@@ -50,7 +52,11 @@ class LocalGitService:
         """Run a git command in a specific repo directory."""
         try:
             result = subprocess.run(
-                ["git", "-C", repo_path] + args, capture_output=True, text=True, check=True, timeout=15
+                ["git", "-C", repo_path] + args,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=15,
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -101,7 +107,9 @@ class LocalGitService:
 
         changed_files = self._get_changed_files(repo_path)
         sync_status = self._get_sync_status(repo_path)
-        current_branch = self._run_git(repo_path, ["branch", "--show-current"]) or "main"
+        current_branch = (
+            self._run_git(repo_path, ["branch", "--show-current"]) or "main"
+        )
         health = self._run_health_check(repo_path)
         risk = self._calculate_risk(repo_path)
 
@@ -178,23 +186,33 @@ class LocalGitService:
             # Node.js project — try lint
             try:
                 result = subprocess.run(
-                    ["npm", "run", "lint", "--silent"], cwd=repo_path, capture_output=True, text=True, timeout=60
+                    ["npm", "run", "lint", "--silent"],
+                    cwd=repo_path,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
                 )
                 if result.returncode != 0:
                     for line in result.stderr.splitlines() + result.stdout.splitlines():
                         line = line.strip()
-                        if line and ("error" in line.lower() or "warning" in line.lower()):
+                        if line and (
+                            "error" in line.lower() or "warning" in line.lower()
+                        ):
                             errors.append(line)
             except (subprocess.TimeoutExpired, FileNotFoundError):
                 pass
 
-        elif os.path.isfile(os.path.join(repo_path, "requirements.txt")) or os.path.isfile(
-            os.path.join(repo_path, "pyproject.toml")
-        ):
+        elif os.path.isfile(
+            os.path.join(repo_path, "requirements.txt")
+        ) or os.path.isfile(os.path.join(repo_path, "pyproject.toml")):
             # Python project — try syntax check
             try:
                 result = subprocess.run(
-                    ["python3", "-m", "py_compile", "--help"], cwd=repo_path, capture_output=True, text=True, timeout=10
+                    ["python3", "-m", "py_compile", "--help"],
+                    cwd=repo_path,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
                 )
             except (subprocess.TimeoutExpired, FileNotFoundError):
                 pass
@@ -221,8 +239,12 @@ class LocalGitService:
 
             result = self.analyzer.analyze_pr(
                 {
-                    "lines_added": sum(f.get("additions", 0) for f in diff_info["files"]),
-                    "lines_deleted": sum(f.get("deletions", 0) for f in diff_info["files"]),
+                    "lines_added": sum(
+                        f.get("additions", 0) for f in diff_info["files"]
+                    ),
+                    "lines_deleted": sum(
+                        f.get("deletions", 0) for f in diff_info["files"]
+                    ),
                     "files_changed": len(diff_info["files"]),
                     "has_config_changes": has_config,
                     "has_dependency_changes": has_dep,
@@ -278,7 +300,8 @@ class LocalGitService:
                 pr_res = await db.execute(
                     select(PullRequest).where(
                         PullRequest.repo_id == repo.id,
-                        PullRequest.github_pr_number == 0,  # Identifier for local changes
+                        PullRequest.github_pr_number
+                        == 0,  # Identifier for local changes
                     )
                 )
                 pr = pr_res.scalar_one_or_none()
@@ -321,7 +344,9 @@ class LocalGitService:
                 incident = Incident(
                     ci_run_id=run.id,
                     root_cause=f"Local health check failed in {name}",
-                    error_category="lint" if "npm" in status["health"]["errors"][0] else "syntax",
+                    error_category=(
+                        "lint" if "npm" in status["health"]["errors"][0] else "syntax"
+                    ),
                     status="open",
                 )
                 db.add(incident)
