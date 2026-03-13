@@ -2,6 +2,7 @@
 Root conftest.py — ensures 'app' is importable when running pytest.
 Author: Arsh Verma
 """
+
 import sys
 import os
 
