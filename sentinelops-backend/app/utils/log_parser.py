@@ -102,7 +102,9 @@ def detect_flaky_test(run_logs: list[str]) -> bool:
 
 
 def detect_anomalous_build_time(
-    current_duration_ms: int, historical_durations: list[int], std_multiplier: float = 2.0
+    current_duration_ms: int,
+    historical_durations: list[int],
+    std_multiplier: float = 2.0,
 ) -> bool:
     """
     Returns True if current build time is anomalously high or low.
@@ -177,6 +179,14 @@ def is_dependency_file(filename: str) -> bool:
 
 def is_test_file(filename: str) -> bool:
     """Check if a file is a test file."""
-    test_patterns = ["test_", "_test.", ".test.", ".spec.", "/tests/", "/test/", "__tests__"]
+    test_patterns = [
+        "test_",
+        "_test.",
+        ".test.",
+        ".spec.",
+        "/tests/",
+        "/test/",
+        "__tests__",
+    ]
     lower = filename.lower()
     return any(p in lower for p in test_patterns)
