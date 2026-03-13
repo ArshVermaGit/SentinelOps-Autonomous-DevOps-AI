@@ -2,15 +2,12 @@
 SentinelOps API - Decision Intelligence for DevOps
 Author: Arsh Verma
 """
-from contextlib import asynccontextmanager
+
 import logging
 import traceback
+from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-
 from app.core.config import settings
 from app.core.database import create_tables
 from app.routers import (
@@ -21,15 +18,21 @@ from app.routers import (
     local_dev,
     pull_requests,
     repositories,
+)
+from app.routers import settings as settings_router
+from app.routers import (
     simulation,
     webhooks,
 )
-from app.routers import settings as settings_router
 from app.services.websocket_service import manager
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,6 +43,7 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to create database tables: {e}")
         logger.error(traceback.format_exc())
     yield
+
 
 app = FastAPI(
     title="SentinelOps API",
@@ -55,8 +59,9 @@ Engineering decision intelligence. Detect failures before they impact production
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+
 
 # Global Exception Handler
 @app.exception_handler(Exception)
@@ -64,12 +69,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}")
     logger.error(traceback.format_exc())
     return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "An internal server error occurred.",
-            "type": exc.__class__.__name__
-        }
+        status_code=500, content={"detail": "An internal server error occurred.", "type": exc.__class__.__name__}
     )
+
 
 # Configurable CORS origins
 app.add_middleware(
@@ -92,9 +94,11 @@ app.include_router(settings_router.router, prefix="/api/settings", tags=["Settin
 app.include_router(analytics_advanced.router, prefix="/api/analytics", tags=["Analytics"])
 app.include_router(local_dev.router, prefix="/api/local", tags=["Local Dev"])
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "SentinelOps"}
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -111,6 +115,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
         manager.disconnect(websocket)
+
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
