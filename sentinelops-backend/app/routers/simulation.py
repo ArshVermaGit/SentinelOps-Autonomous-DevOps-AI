@@ -23,7 +23,9 @@ async def simulate_fix(incident_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Incident not found")
 
     if not incident.suggested_fix:
-        raise HTTPException(status_code=400, detail="No fix available for this incident")
+        raise HTTPException(
+            status_code=400, detail="No fix available for this incident"
+        )
 
     # Simulate processing time (makes demo feel real)
     await asyncio.sleep(2)
@@ -41,7 +43,11 @@ async def simulate_fix(incident_id: int, db: AsyncSession = Depends(get_db)):
             "status": "success",
             "duration_ms": 350,
         },
-        {"step": "Install repository dependencies", "status": "success", "duration_ms": 4200},
+        {
+            "step": "Install repository dependencies",
+            "status": "success",
+            "duration_ms": 4200,
+        },
     ]
 
     # Determine test suites dynamically
@@ -49,7 +55,10 @@ async def simulate_fix(incident_id: int, db: AsyncSession = Depends(get_db)):
     if "ui" in workflow or "frontend" in workflow:
         test_steps = [("Run component tests", 8000), ("Run e2e (Cypress)", 15000)]
     elif "api" in workflow or "backend" in workflow:
-        test_steps = [("Run unit tests (pytest)", 5000), ("Run integration DB tests", 12000)]
+        test_steps = [
+            ("Run unit tests (pytest)", 5000),
+            ("Run integration DB tests", 12000),
+        ]
     else:
         test_steps = [("Run standard test suite", 10000)]
 
@@ -57,18 +66,28 @@ async def simulate_fix(incident_id: int, db: AsyncSession = Depends(get_db)):
         # If failure is predicted, fail on the last test step
         is_last_test = name == test_steps[-1][0]
         if not success and is_last_test:
-            steps.append({"step": name, "status": "failure", "duration_ms": base_duration})
+            steps.append(
+                {"step": name, "status": "failure", "duration_ms": base_duration}
+            )
             break
         steps.append({"step": name, "status": "success", "duration_ms": base_duration})
 
     if success:
-        steps.append({"step": "Build verified Docker image", "status": "success", "duration_ms": 18000})
+        steps.append(
+            {
+                "step": "Build verified Docker image",
+                "status": "success",
+                "duration_ms": 18000,
+            }
+        )
 
     simulation_result = {
         "success": success,
         "steps": steps,
         "predicted_outcome": (
-            "CI pipeline would PASS" if success else "CI pipeline would still FAIL — additional fix required"
+            "CI pipeline would PASS"
+            if success
+            else "CI pipeline would still FAIL — additional fix required"
         ),
         "confidence": f"{int(success_probability * 100)}%",
         "tests_passed": 142 if success else 24,  # Deterministic based on outcome
