@@ -3,7 +3,6 @@ Incident Management Router
 Author: Arsh Verma
 """
 
-
 from app.core.database import get_db
 from app.models.incident import Incident
 from app.models.incident_event import IncidentEvent
@@ -19,7 +18,9 @@ router = APIRouter()
 
 @router.get("/")
 async def list_incidents(
-    status: str | None = None, limit: int = Query(default=20, le=100), db: AsyncSession = Depends(get_db)
+    status: str | None = None,
+    limit: int = Query(default=20, le=100),
+    db: AsyncSession = Depends(get_db),
 ):
     query = select(Incident).order_by(desc(Incident.created_at))
     if status:
@@ -50,7 +51,10 @@ async def list_incidents(
 async def get_incident_graph(db: AsyncSession = Depends(get_db)):
     """Return incident relationship graph data for visualization."""
     result = await db.execute(
-        select(Incident).options(selectinload(Incident.ci_run)).order_by(desc(Incident.created_at)).limit(20)
+        select(Incident)
+        .options(selectinload(Incident.ci_run))
+        .order_by(desc(Incident.created_at))
+        .limit(20)
     )
     incidents = result.scalars().all()
 
@@ -71,7 +75,11 @@ async def get_incident_graph(db: AsyncSession = Depends(get_db)):
 
 @router.get("/{incident_id}")
 async def get_incident(incident_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Incident).where(Incident.id == incident_id).options(selectinload(Incident.ci_run)))
+    result = await db.execute(
+        select(Incident)
+        .where(Incident.id == incident_id)
+        .options(selectinload(Incident.ci_run))
+    )
     incident = result.scalar_one_or_none()
 
     if not incident:
@@ -80,7 +88,9 @@ async def get_incident(incident_id: int, db: AsyncSession = Depends(get_db)):
     # Build relationship_data for IncidentMemoryGraph
     relationship_data = None
     if incident.ci_run and incident.ci_run.pr_id:
-        pr_result = await db.execute(select(PullRequest).where(PullRequest.id == incident.ci_run.pr_id))
+        pr_result = await db.execute(
+            select(PullRequest).where(PullRequest.id == incident.ci_run.pr_id)
+        )
         pr = pr_result.scalar_one_or_none()
         if pr:
             relationship_data = {
@@ -130,7 +140,9 @@ class ResolveRequest(BaseModel):
 
 
 @router.patch("/{incident_id}/resolve")
-async def resolve_incident(incident_id: int, req: ResolveRequest, db: AsyncSession = Depends(get_db)):
+async def resolve_incident(
+    incident_id: int, req: ResolveRequest, db: AsyncSession = Depends(get_db)
+):
     """Mark an incident as resolved with optional notes."""
     result = await db.execute(select(Incident).where(Incident.id == incident_id))
     incident = result.scalar_one_or_none()
@@ -158,7 +170,9 @@ async def resolve_incident(incident_id: int, req: ResolveRequest, db: AsyncSessi
 async def get_incident_timeline(incident_id: int, db: AsyncSession = Depends(get_db)):
     """Return chronological event timeline for an incident."""
     result = await db.execute(
-        select(IncidentEvent).where(IncidentEvent.incident_id == incident_id).order_by(IncidentEvent.created_at)
+        select(IncidentEvent)
+        .where(IncidentEvent.incident_id == incident_id)
+        .order_by(IncidentEvent.created_at)
     )
     events = result.scalars().all()
 
