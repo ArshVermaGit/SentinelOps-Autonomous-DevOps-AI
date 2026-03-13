@@ -3,7 +3,6 @@ Local Development Router - Multi-repo management endpoints.
 Author: Arsh Verma
 """
 
-
 from app.services.local_git_service import local_git
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -34,7 +33,11 @@ async def link_repo(req: LinkRepoRequest):
     success = local_git.link_repo(req.name, req.local_path, req.github_url)
     if not success:
         raise HTTPException(
-            status_code=400, detail="Invalid path — no .git directory found. Make sure the folder is a git repo."
+            status_code=400,
+            detail=(
+                "Invalid path — no .git directory found. "
+                "Make sure the folder is a git repo."
+            ),
         )
     return {"status": "linked", "name": req.name, "local_path": req.local_path}
 
@@ -60,7 +63,9 @@ async def commit_repo(req: CommitRequest):
     """Stage all, commit, and push for a specific repo."""
     result = local_git.commit_and_push(req.local_path, req.message)
     if not result["success"]:
-        raise HTTPException(status_code=500, detail=result.get("error", "Commit failed"))
+        raise HTTPException(
+            status_code=500, detail=result.get("error", "Commit failed")
+        )
     return result
 
 
@@ -93,5 +98,7 @@ async def commit_legacy(req: CommitRequest):
     """Legacy endpoint — commit first linked repo."""
     result = local_git.commit_and_push(req.local_path, req.message)
     if not result["success"]:
-        raise HTTPException(status_code=500, detail=result.get("error", "Commit failed"))
+        raise HTTPException(
+            status_code=500, detail=result.get("error", "Commit failed")
+        )
     return result
