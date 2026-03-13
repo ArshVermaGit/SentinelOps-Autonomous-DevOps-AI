@@ -26,7 +26,9 @@ class CIAnalyzer:
             "mean_ms": int(mean),
             "stdev_ms": int(stdev),
             "reason": (
-                f"Build time is {abs(z_score):.1f} std deviations from mean" if is_anomalous else "Within normal range"
+                f"Build time is {abs(z_score):.1f} std deviations from mean"
+                if is_anomalous
+                else "Within normal range"
             ),
         }
 
