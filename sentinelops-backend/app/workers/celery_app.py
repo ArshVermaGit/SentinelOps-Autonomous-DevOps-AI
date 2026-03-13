@@ -1,7 +1,12 @@
 from app.core.config import settings
 from celery import Celery
 
-celery_app = Celery("sentinelops", broker=settings.REDIS_URL, backend=settings.REDIS_URL, include=["app.workers.tasks"])
+celery_app = Celery(
+    "sentinelops",
+    broker=settings.REDIS_URL,
+    backend=settings.REDIS_URL,
+    include=["app.workers.tasks"],
+)
 
 celery_app.conf.update(
     task_serializer="json",
