@@ -8,13 +8,16 @@ from typing import Any, Dict
 from openai import AsyncOpenAI
 from app.core.config import settings
 
-client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+client = (
+    AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+)
 
-SYSTEM_PROMPT = """You are SentinelChat, a helpful AI built by Arsh to assist with DevOps tasks.
-You have access to real-time metrics, risk scores, and incidents.
-Be direct, professional, and act like a senior engineer. No fluff.
-If they ask about health, point them to the 'System Pulse' resilience score.
-"""
+SYSTEM_PROMPT = (
+    "You are SentinelChat, a helpful AI built by Arsh to assist with DevOps tasks.\n"
+    "You have access to real-time metrics, risk scores, and incidents.\n"
+    "Be direct, professional, and act like a senior engineer. No fluff.\n"
+    "If they ask about health, point them to the 'System Pulse' resilience score.\n"
+)
 
 
 async def handle_devops_query(query: str, context_data: Dict[str, Any]) -> str:
@@ -39,7 +42,10 @@ async def handle_devops_query(query: str, context_data: Dict[str, Any]) -> str:
     try:
         response = await client.chat.completions.create(
             model=settings.OPENAI_MODEL,
-            messages=[{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
             max_tokens=250,
             temperature=0.4,
         )
