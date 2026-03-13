@@ -34,16 +34,22 @@ async def get_dashboard_summary(db: AsyncSession = Depends(get_db)):
 
     # CI runs last 30 days
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    runs_result = await db.execute(select(CIRun).where(CIRun.started_at >= thirty_days_ago))
+    runs_result = await db.execute(
+        select(CIRun).where(CIRun.started_at >= thirty_days_ago)
+    )
     runs = runs_result.scalars().all()
 
     # Incidents last 30 days
-    incidents_result = await db.execute(select(Incident).order_by(desc(Incident.created_at)).limit(10))
+    incidents_result = await db.execute(
+        select(Incident).order_by(desc(Incident.created_at)).limit(10)
+    )
     recent_incidents = incidents_result.scalars().all()
 
     total_runs = len(runs)
     failed_runs = sum(1 for r in runs if r.status == "failure")
-    success_rate = ((total_runs - failed_runs) / total_runs * 100) if total_runs > 0 else 100
+    success_rate = (
+        ((total_runs - failed_runs) / total_runs * 100) if total_runs > 0 else 100
+    )
 
     from app.services.resilience_service import resilience_engine
 
@@ -86,8 +92,12 @@ async def chat_with_sentinel(payload: dict, db: AsyncSession = Depends(get_db)):
 
     # Gather context
     pulse = await resilience_engine.calculate_pulse(db)
-    high_risk_prs = await db.execute(select(func.count(PullRequest.id)).where(PullRequest.risk_level == "high"))
-    open_incidents = await db.execute(select(func.count(Incident.id)).where(Incident.status == "open"))
+    high_risk_prs = await db.execute(
+        select(func.count(PullRequest.id)).where(PullRequest.risk_level == "high")
+    )
+    open_incidents = await db.execute(
+        select(func.count(Incident.id)).where(Incident.status == "open")
+    )
 
     context = {
         "pulse": pulse,
@@ -104,7 +114,9 @@ async def chat_with_sentinel(payload: dict, db: AsyncSession = Depends(get_db)):
 async def get_ci_health(days: int = 30, db: AsyncSession = Depends(get_db)):
     """CI health trends for charting."""
     start = datetime.utcnow() - timedelta(days=days)
-    result = await db.execute(select(CIRun).where(CIRun.started_at >= start).order_by(CIRun.started_at))
+    result = await db.execute(
+        select(CIRun).where(CIRun.started_at >= start).order_by(CIRun.started_at)
+    )
     runs = result.scalars().all()
 
     # Group by day
@@ -112,7 +124,13 @@ async def get_ci_health(days: int = 30, db: AsyncSession = Depends(get_db)):
     for run in runs:
         day = run.started_at.strftime("%Y-%m-%d")
         if day not in daily_data:
-            daily_data[day] = {"date": day, "success": 0, "failure": 0, "total": 0, "avg_duration": 0}
+            daily_data[day] = {
+                "date": day,
+                "success": 0,
+                "failure": 0,
+                "total": 0,
+                "avg_duration": 0,
+            }
         daily_data[day]["total"] += 1
         if run.status == "failure":
             daily_data[day]["failure"] += 1
@@ -130,11 +148,16 @@ async def get_ci_health(days: int = 30, db: AsyncSession = Depends(get_db)):
 @router.get("/risk-heatmap")
 async def get_risk_heatmap(db: AsyncSession = Depends(get_db)):
     """Risk heatmap data — repos and PRs ranked by risk."""
-    repos_result = await db.execute(select(Repository).order_by(desc(Repository.risk_score)))
+    repos_result = await db.execute(
+        select(Repository).order_by(desc(Repository.risk_score))
+    )
     repos = repos_result.scalars().all()
 
     prs_result = await db.execute(
-        select(PullRequest).where(PullRequest.status == "open").order_by(desc(PullRequest.risk_probability)).limit(20)
+        select(PullRequest)
+        .where(PullRequest.status == "open")
+        .order_by(desc(PullRequest.risk_probability))
+        .limit(20)
     )
     prs = prs_result.scalars().all()
 
@@ -144,7 +167,11 @@ async def get_risk_heatmap(db: AsyncSession = Depends(get_db)):
                 "id": r.id,
                 "name": r.name,
                 "risk_score": r.risk_score,
-                "risk_level": "high" if r.risk_score > 0.65 else "caution" if r.risk_score > 0.35 else "safe",
+                "risk_level": (
+                    "high"
+                    if r.risk_score > 0.65
+                    else "caution" if r.risk_score > 0.35 else "safe"
+                ),
             }
             for r in repos
         ],
@@ -168,20 +195,26 @@ async def get_recent_activities(limit: int = 15, db: AsyncSession = Depends(get_
     activities = []
 
     # 1. Recent Incidents
-    inc_query = await db.execute(select(Incident).order_by(desc(Incident.created_at)).limit(limit))
+    inc_query = await db.execute(
+        select(Incident).order_by(desc(Incident.created_at)).limit(limit)
+    )
     for inc in inc_query.scalars().all():
         activities.append(
             {
                 "id": f"inc_{inc.id}",
                 "type": "incident",
-                "message": f"AI analysis complete: {(inc.root_cause or 'Unknown')[:50]}...",
+                "message": (
+                    f"AI analysis complete: {(inc.root_cause or 'Unknown')[:50]}..."
+                ),
                 "time": inc.created_at,
                 "timestamp": inc.created_at,
             }
         )
 
     # 2. Recent CI Runs (Failures and Successes)
-    run_query = await db.execute(select(CIRun).order_by(desc(CIRun.started_at)).limit(limit))
+    run_query = await db.execute(
+        select(CIRun).order_by(desc(CIRun.started_at)).limit(limit)
+    )
     for run in run_query.scalars().all():
         activities.append(
             {
@@ -205,7 +238,10 @@ async def get_recent_activities(limit: int = 15, db: AsyncSession = Depends(get_
             {
                 "id": f"pr_{pr.id}",
                 "type": "pr_risk",
-                "message": f"{'🔴 High-risk' if pr.risk_level == 'high' else '🟡 Caution'}: PR '{pr.title}'",
+                "message": (
+                    f"{'🔴 High-risk' if pr.risk_level == 'high' else '🟡 Caution'}: "
+                    f"PR '{pr.title}'"
+                ),
                 "time": pr.created_at,
                 "timestamp": pr.created_at,
             }
@@ -215,6 +251,7 @@ async def get_recent_activities(limit: int = 15, db: AsyncSession = Depends(get_
     activities.sort(key=lambda x: x["timestamp"], reverse=True)
 
     from datetime import datetime
+
     now = datetime.utcnow()
     for act in activities:
         ts = act["timestamp"]
@@ -227,7 +264,11 @@ async def get_recent_activities(limit: int = 15, db: AsyncSession = Depends(get_
 
         diff = now - ts
         mins = int(diff.total_seconds() / 60)
-        act["time"] = "just now" if mins == 0 else f"{mins}m ago" if mins < 60 else f"{mins//60}h ago"
+        act["time"] = (
+            "just now"
+            if mins == 0
+            else f"{mins}m ago" if mins < 60 else f"{mins//60}h ago"
+        )
         del act["timestamp"]  # Clean up sort key
 
     return activities[:limit]
