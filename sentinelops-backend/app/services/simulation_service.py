@@ -14,7 +14,9 @@ class DigitalTwinEngine:
     Simulates how changes might impact the system based on historical patterns.
     """
 
-    def simulate_deployment(self, pr_data: Dict[str, Any], repo_stats: Dict[str, Any]) -> Dict[str, Any]:
+    def simulate_deployment(
+        self, pr_data: Dict[str, Any], repo_stats: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Runs a Monte Carlo simulation (1000 iterations) to estimate reliability.
         """
@@ -23,7 +25,9 @@ class DigitalTwinEngine:
             {
                 **pr_data,
                 "author_failure_rate": repo_stats.get("author_failure_rate", 0.15),
-                "time_since_last_deploy_hours": repo_stats.get("time_since_last_deploy", 24),
+                "time_since_last_deploy_hours": repo_stats.get(
+                    "time_since_last_deploy", 24
+                ),
             }
         )
 
@@ -66,7 +70,10 @@ class DigitalTwinEngine:
             "simulated_failure_rate": round(failure_rate, 3),
             "estimated_impact": round(avg_impact, 2),
             "verdict": verdict,
-            "confidence_interval": [round(failure_rate - 0.02, 3), round(failure_rate + 0.02, 3)],
+            "confidence_interval": [
+                round(failure_rate - 0.02, 3),
+                round(failure_rate + 0.02, 3),
+            ],
             "simulation_iterations": iterations,
             "risk_distribution": self._generate_risk_distribution(failure_rate),
         }
