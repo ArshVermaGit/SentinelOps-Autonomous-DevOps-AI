@@ -3,6 +3,7 @@ SentinelOps Demo Data Seeder
 Author: Arsh Verma
 Populates the database with realistic data for a perfect dashboard experience.
 """
+
 import asyncio
 import os
 import random
@@ -32,9 +33,7 @@ async def seed():
         db_url = db_url.replace("sqlite://", "sqlite+aiosqlite://")
 
     engine = create_async_engine(db_url)
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -49,7 +48,7 @@ async def seed():
                 url="https://github.com/ArshVermaGit/sentinel-core",
                 github_id=9001,
                 risk_score=0.42,
-                failure_rate=0.15
+                failure_rate=0.15,
             ),
             Repository(
                 name="api-gateway",
@@ -57,7 +56,7 @@ async def seed():
                 url="https://github.com/ArshVermaGit/api-gateway",
                 github_id=9002,
                 risk_score=0.78,
-                failure_rate=0.28
+                failure_rate=0.28,
             ),
             Repository(
                 name="data-pipeline",
@@ -65,7 +64,7 @@ async def seed():
                 url="https://github.com/ArshVermaGit/data-pipeline",
                 github_id=9003,
                 risk_score=0.85,
-                failure_rate=0.35
+                failure_rate=0.35,
             ),
             Repository(
                 name="frontend-app",
@@ -73,7 +72,7 @@ async def seed():
                 url="https://github.com/ArshVermaGit/frontend-app",
                 github_id=9004,
                 risk_score=0.25,
-                failure_rate=0.08
+                failure_rate=0.08,
             ),
         ]
         db.add_all(repos)
@@ -81,9 +80,12 @@ async def seed():
 
         print("🌱 Seeding Pull Requests...")
         pr_titles = [
-            "feat: add distributed tracing", "fix: memory leak in worker",
-            "refactor: optimize db queries", "docs: update api spec",
-            "chore: upgrade dependencies", "feat: implement mfa support"
+            "feat: add distributed tracing",
+            "fix: memory leak in worker",
+            "refactor: optimize db queries",
+            "docs: update api spec",
+            "chore: upgrade dependencies",
+            "feat: implement mfa support",
         ]
         authors = ["arshverma", "dev-wizard", "infra-expert", "code-ninja"]
 
@@ -97,9 +99,9 @@ async def seed():
                     head_branch=f"feature/demo-{i}",
                     status="open",
                     risk_level=(
-                        "high" if random.random() > 0.7
-                        else "caution" if random.random() > 0.4
-                        else "safe"
+                        "high"
+                        if random.random() > 0.7
+                        else "caution" if random.random() > 0.4 else "safe"
                     ),
                     risk_probability=random.uniform(0.1, 0.9),
                     risk_factors=(
@@ -109,7 +111,7 @@ async def seed():
                     ),
                     created_at=(
                         datetime.utcnow() - timedelta(days=random.randint(1, 5))
-                    )
+                    ),
                 )
                 db.add(pr)
         await db.commit()
@@ -126,7 +128,7 @@ async def seed():
                     workflow_name="CI Pipeline",
                     status=status,
                     duration_ms=random.randint(120000, 480000),
-                    started_at=date - timedelta(hours=random.randint(0, 23))
+                    started_at=date - timedelta(hours=random.randint(0, 23)),
                 )
                 db.add(run)
         await db.commit()
@@ -136,21 +138,19 @@ async def seed():
             "Flaky network during npm install",
             "Database lock contention during migrations",
             "Missing environment variable",
-            "Race condition in async worker"
+            "Race condition in async worker",
         ]
 
         for i in range(5):
             inc = Incident(
                 ci_run_id=i + 1,  # Use sequential IDs for simplicity in demo
                 status="resolved" if random.random() > 0.3 else "open",
-                error_category=random.choice([
-                    "dependency", "syntax", "test", "config", "net", "runtime"
-                ]),
+                error_category=random.choice(
+                    ["dependency", "syntax", "test", "config", "net", "runtime"]
+                ),
                 root_cause=random.choice(causes),
                 suggested_fix="Check resource limits or increase timeout.",
-                created_at=(
-                    datetime.utcnow() - timedelta(days=random.randint(1, 10))
-                )
+                created_at=(datetime.utcnow() - timedelta(days=random.randint(1, 10))),
             )
             db.add(inc)
             await db.flush()  # Get ID
@@ -158,10 +158,7 @@ async def seed():
             # Add embedding for similarity search demo
             log_text = f"ERROR: {inc.root_cause} at {datetime.utcnow()}"
             vector = embed_log(log_text)
-            emb = LogEmbedding(
-                ci_run_id=inc.ci_run_id,
-                embedding_vector=vector
-            )
+            emb = LogEmbedding(ci_run_id=inc.ci_run_id, embedding_vector=vector)
             db.add(emb)
 
         await db.commit()
