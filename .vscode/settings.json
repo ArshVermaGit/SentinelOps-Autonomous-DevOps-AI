@@ -1,3 +1,4 @@
 {
-  "git.ignoreLimitWarning": true
+  "python.analysis.extraPaths": ["sentinelops-backend"],
+  "python.defaultInterpreterPath": "sentinelops-backend/.venv/bin/python"
 }
