@@ -3,7 +3,6 @@ SentinelOps Project Configuration
 Author: Arsh Verma
 """
 
-
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
