@@ -18,7 +18,9 @@ class IncidentEvent(Base):
     # Event metadata
     event_type = Column(
         String, nullable=False
-    )  # "created" | "analyzed" | "similar_found" | "fix_suggested" | "simulated" | "resolved"
+    )
+    # "created" | "analyzed" | "similar_found" | "fix_suggested" | "simulated"
+    # | "resolved"
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     event_data = Column(JSON, default=dict)  # Extra context per event type
