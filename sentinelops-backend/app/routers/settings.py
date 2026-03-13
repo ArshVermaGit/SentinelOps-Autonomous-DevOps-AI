@@ -3,7 +3,6 @@ SentinelOps Settings Router
 Author: Arsh Verma
 """
 
-
 from app.core.database import get_db
 from app.models.notification import Notification
 from app.models.repository import Repository
@@ -31,7 +30,9 @@ async def get_settings(db: AsyncSession = Depends(get_db)):
                 "is_active": r.is_active,
                 "risk_score": r.risk_score,
                 "failure_rate": r.failure_rate,
-                "last_analyzed": r.last_analyzed.isoformat() if r.last_analyzed else None,
+                "last_analyzed": (
+                    r.last_analyzed.isoformat() if r.last_analyzed else None
+                ),
             }
             for r in repos
         ],
@@ -91,15 +92,21 @@ class NotificationMarkRead(BaseModel):
 
 
 @router.post("/notifications/read")
-async def mark_notifications_read(req: NotificationMarkRead, db: AsyncSession = Depends(get_db)):
+async def mark_notifications_read(
+    req: NotificationMarkRead, db: AsyncSession = Depends(get_db)
+):
     """Mark notifications as read."""
     if req.mark_all:
-        result = await db.execute(select(Notification).where(Notification.is_read == "unread"))
+        result = await db.execute(
+            select(Notification).where(Notification.is_read == "unread")
+        )
         for n in result.scalars().all():
             n.is_read = "read"
     else:
         for nid in req.ids:
-            result = await db.execute(select(Notification).where(Notification.id == nid))
+            result = await db.execute(
+                select(Notification).where(Notification.id == nid)
+            )
             n = result.scalar_one_or_none()
             if n:
                 n.is_read = "read"
