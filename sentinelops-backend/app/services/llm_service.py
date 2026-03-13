@@ -8,7 +8,9 @@ import json
 from app.core.config import settings
 from openai import AsyncOpenAI
 
-client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+client = (
+    AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+)
 
 LLM_SYSTEM_PROMPT = """You are SentinelOps, an expert DevOps root cause analyzer.
 You analyze CI/CD failures and provide structured, actionable insights.
@@ -38,13 +40,16 @@ LLM_USER_TEMPLATE = """A CI pipeline has failed. Analyze and respond in JSON onl
 }}"""
 
 
-async def analyze_failure(error_log: str, code_diff: str, similar_incidents: list) -> dict:
+async def analyze_failure(
+    error_log: str, code_diff: str, similar_incidents: list
+) -> dict:
     """Call OpenAI to analyze CI failure and return structured root cause."""
 
     similar_text = (
         "\n".join(
             [
-                f"- Incident #{inc['id']}: {inc['root_cause']} (similarity: {inc['similarity_score']:.0%})"
+                f"- Incident #{inc['id']}: {inc['root_cause']} "
+                f"(similarity: {inc['similarity_score']:.0%})"
                 for inc in similar_incidents[:3]
             ]
         )
@@ -64,7 +69,7 @@ async def analyze_failure(error_log: str, code_diff: str, similar_incidents: lis
         model=settings.OPENAI_MODEL,
         messages=[
             {"role": "system", "content": LLM_SYSTEM_PROMPT},
-            {"role": "user", "content": user_message}
+            {"role": "user", "content": user_message},
         ],
         temperature=0.1,  # Low temperature for deterministic analysis
         max_tokens=1500,
@@ -78,7 +83,10 @@ async def analyze_failure(error_log: str, code_diff: str, similar_incidents: lis
 async def analyze_failure_mock(error_log: str) -> dict:
     """Mock LLM response for demo without API key."""
     return {
-        "root_cause": "Import error in database connection module caused by missing environment variable DB_HOST",
+        "root_cause": (
+            "Import error in database connection module caused by "
+            "missing environment variable DB_HOST"
+        ),
         "responsible_files": ["app/database.py", "docker compose.yml"],
         "error_category": "logic",
         "llm_confidence": 0.85,
