@@ -21,7 +21,10 @@ def get_model():
             with open(model_path, "rb") as f:
                 _model_cache = pickle.load(f)
         else:
-            print("WARNING: Model not found. Run app/ml/train.py first. Using rule-based fallback.")
+            print(
+                "WARNING: Model not found. Run app/ml/train.py first. "
+                "Using rule-based fallback."
+            )
             _model_cache = None
     return _model_cache
 
@@ -88,5 +91,7 @@ def normalize_pr_features(raw: dict) -> dict:
         "is_large_pr": int(total_lines > 500),
         "dependency_changes": int(raw.get("has_dependency_changes", False)),
         "complexity_score": raw.get("complexity_score", 0.5),
-        "time_since_last_deploy": min(raw.get("time_since_last_deploy_hours", 48) / 168, 1.0),
+        "time_since_last_deploy": min(
+            raw.get("time_since_last_deploy_hours", 48) / 168, 1.0
+        ),
     }
