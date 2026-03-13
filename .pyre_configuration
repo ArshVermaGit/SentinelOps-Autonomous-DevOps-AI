@@ -1,0 +1,9 @@
+{
+  "source_directories": [
+    "sentinelops-backend"
+  ],
+  "search_path": [
+    "sentinelops-backend/.venv/lib/python3.12/site-packages",
+    "sentinelops-backend"
+  ]
+}
