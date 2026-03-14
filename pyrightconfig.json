@@ -5,7 +5,7 @@
       "extraPaths": ["sentinelops-backend"]
     }
   ],
-  "venvPath": "sentinelops-backend/.venv",
-  "venv": ".",
+  "venvPath": ".",
+  "venv": ".venv",
   "extraPaths": ["sentinelops-backend"]
 }
