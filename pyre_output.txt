@@ -1,0 +1,12 @@
+sentinelops-backend/alembic/env.py:7:0 Undefined import [21]: Could not find a module corresponding to import `app.database`.
+sentinelops-backend/alembic/env.py:14:18 Undefined attribute [16]: Module `app` has no attribute `database`.
+sentinelops-backend/app/core/config.py:47:4 Inconsistent override [15]: `model_config` overrides attribute defined in `pydantic_settings.main.BaseSettings` inconsistently. Type `pydantic.config.ConfigDict` is not a subtype of the overridden attribute `pydantic_settings.main.SettingsConfigDict`.
+sentinelops-backend/app/core/config.py:47:19 Unexpected keyword [28]: Unexpected keyword argument `env_file` to call `pydantic.config.ConfigDict.__init__`.
+sentinelops-backend/app/core/database.py:24:9 Undefined attribute [16]: Module `sqlalchemy.ext.asyncio` has no attribute `create_async_engine`.
+sentinelops-backend/app/core/database.py:28:48 Undefined attribute [16]: Module `sqlalchemy.ext.asyncio` has no attribute `AsyncSession`.
+sentinelops-backend/app/routers/pull_requests.py:17:4 Incompatible variable type [9]: risk_level is declared to have type `str` but is used as type `None`.
+sentinelops-backend/app/routers/pull_requests.py:18:4 Incompatible variable type [9]: repo_id is declared to have type `int` but is used as type `None`.
+sentinelops-backend/app/services/embedding_service.py:49:4 Incompatible variable type [9]: a is declared to have type `List[typing.Any]` but is used as type `ndarray[typing.Any, dtype[typing.Any]]`.
+sentinelops-backend/app/services/embedding_service.py:49:7 Incompatible variable type [9]: b is declared to have type `List[typing.Any]` but is used as type `ndarray[typing.Any, dtype[typing.Any]]`.
+sentinelops-backend/scripts/seed_demo_data.py:19:0 Undefined import [21]: Could not find a module corresponding to import `app.config`.
+sentinelops-backend/scripts/seed_demo_data.py:20:0 Undefined import [21]: Could not find a module corresponding to import `app.database`.
