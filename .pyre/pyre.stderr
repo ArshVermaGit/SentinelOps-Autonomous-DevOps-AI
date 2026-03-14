@@ -1,0 +1,164 @@
+2026-03-15 04:48:53,008 [PID 67673] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-03-15 04:48:53,008 [PID 67673] INFO Pyre binary is located at `/Users/arshverma/GitHub/SentinelOps/.venv/bin/pyre.bin`
+2026-03-15 04:48:53,009 [PID 67673] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 3.
+2026-03-15 04:48:53,009 [PID 67673] INFO No typeshed specified, looking for it...
+2026-03-15 04:48:53,009 [PID 67673] INFO Found: `/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed`
+2026-03-15 04:48:53,010 [PID 67673] INFO Writing arguments into /var/folders/sw/lxwcyct55v76pc3svfw6jgnr0000gn/T/pyre_arguments_qzt6wv5p.json...
+2026-03-15 04:48:53,010 [PID 67673] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend"
+    ]
+  },
+  "search_paths": [
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/python3.12/site-packages",
+    "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stdlib",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [],
+  "checked_directory_allowlist": [
+    "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/arshverma/GitHub/SentinelOps/.pyre",
+  "global_root": "/Users/arshverma/GitHub/SentinelOps",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 12,
+    "micro": 11
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 3,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-03-15 04:48:59,759 [PID 67673] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.001s
+2026-03-15 04:48:59,773 [PID 67673] PERFORMANCE  Initialized multiprocessing workers (workers: 3): 0.016s
+2026-03-15 04:48:59,773 [PID 67673] INFO  Building module tracker...
+2026-03-15 04:49:02,009 [PID 67673] PERFORMANCE  Module tracker built: 2.241s
+2026-03-15 04:49:02,009 [PID 67673] PERFORMANCE  Full environment built: 2.243s
+2026-03-15 04:49:02,009 [PID 67673] INFO  Collecting all definitions...
+2026-03-15 04:49:02,278 [PID 67673] PERFORMANCE  Collected definitions (defines: 238): 0.270s
+2026-03-15 04:49:02,278 [PID 67673] INFO  Checking 238 functions...
+2026-03-15 04:49:05,416 [PID 67673] INFO  Processed 40 of 238 functions
+2026-03-15 04:49:05,734 [PID 67673] INFO  Processed 80 of 238 functions
+2026-03-15 04:49:06,196 [PID 67673] INFO  Processed 120 of 238 functions
+2026-03-15 04:49:06,828 [PID 67673] INFO  Processed 158 of 238 functions
+2026-03-15 04:49:08,656 [PID 67673] INFO  Processed 198 of 238 functions
+2026-03-15 04:49:09,251 [PID 67673] INFO  Processed 238 of 238 functions
+2026-03-15 04:49:09,251 [PID 67673] PERFORMANCE  Check_TypeCheck: 6.970s
+2026-03-15 04:49:09,251 [PID 67673] MEMORY  Shared memory size post-typecheck (size: 13)
+2026-03-15 04:49:09,251 [PID 67673] INFO  Postprocessing 60 sources...
+2026-03-15 04:49:09,347 [PID 67673] INFO  Postprocessed 21 of 60 sources
+2026-03-15 04:49:09,347 [PID 67673] INFO  Postprocessed 39 of 60 sources
+2026-03-15 04:49:09,360 [PID 67673] INFO  Postprocessed 60 of 60 sources
+2026-03-15 04:49:09,360 [PID 67673] PERFORMANCE  Check_Postprocessing: 0.108s
+2026-03-15 04:49:09,360 [PID 67673] PERFORMANCE  Check (request kind: FullCheck): 9.594s
+2026-03-15 04:49:09,387 [PID 67673] ERROR Found 12 type errors!
+2026-03-15 04:49:18,359 [PID 67820] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-03-15 04:49:18,359 [PID 67820] INFO Pyre binary is located at `/Users/arshverma/GitHub/SentinelOps/.venv/bin/pyre.bin`
+2026-03-15 04:49:18,359 [PID 67820] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 3.
+2026-03-15 04:49:18,360 [PID 67820] INFO No typeshed specified, looking for it...
+2026-03-15 04:49:18,360 [PID 67820] INFO Found: `/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed`
+2026-03-15 04:49:18,361 [PID 67820] INFO Writing arguments into /var/folders/sw/lxwcyct55v76pc3svfw6jgnr0000gn/T/pyre_arguments_rlbskwv0.json...
+2026-03-15 04:49:18,361 [PID 67820] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend"
+    ]
+  },
+  "search_paths": [
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/python3.12/site-packages",
+    "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stdlib",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/arshverma/GitHub/SentinelOps/.venv/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [],
+  "checked_directory_allowlist": [
+    "/Users/arshverma/GitHub/SentinelOps/sentinelops-backend"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/arshverma/GitHub/SentinelOps/.pyre",
+  "global_root": "/Users/arshverma/GitHub/SentinelOps",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 12,
+    "micro": 11
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 3,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-03-15 04:49:18,448 [PID 67820] PERFORMANCE  Initialized shared memory (heap size: 8589934592, dep table pow: 1, hash table pow: 26): 0.001s
+2026-03-15 04:49:18,483 [PID 67820] PERFORMANCE  Initialized multiprocessing workers (workers: 3): 0.034s
+2026-03-15 04:49:18,483 [PID 67820] INFO  Building module tracker...
+2026-03-15 04:49:19,539 [PID 67820] PERFORMANCE  Module tracker built: 1.050s
+2026-03-15 04:49:19,540 [PID 67820] PERFORMANCE  Full environment built: 1.050s
+2026-03-15 04:49:19,540 [PID 67820] INFO  Collecting all definitions...
+2026-03-15 04:49:19,813 [PID 67820] PERFORMANCE  Collected definitions (defines: 238): 0.277s
+2026-03-15 04:49:19,814 [PID 67820] INFO  Checking 238 functions...
+2026-03-15 04:49:24,903 [PID 67820] INFO  Processed 40 of 238 functions
+2026-03-15 04:49:25,906 [PID 67820] INFO  Processed 80 of 238 functions
+2026-03-15 04:49:26,504 [PID 67820] INFO  Processed 120 of 238 functions
+2026-03-15 04:49:27,232 [PID 67820] INFO  Processed 158 of 238 functions
+2026-03-15 04:49:29,163 [PID 67820] INFO  Processed 198 of 238 functions
+2026-03-15 04:49:29,786 [PID 67820] INFO  Processed 238 of 238 functions
+2026-03-15 04:49:29,787 [PID 67820] PERFORMANCE  Check_TypeCheck: 9.971s
+2026-03-15 04:49:29,787 [PID 67820] MEMORY  Shared memory size post-typecheck (size: 13)
+2026-03-15 04:49:29,787 [PID 67820] INFO  Postprocessing 60 sources...
+2026-03-15 04:49:29,885 [PID 67820] INFO  Postprocessed 21 of 60 sources
+2026-03-15 04:49:29,885 [PID 67820] INFO  Postprocessed 39 of 60 sources
+2026-03-15 04:49:29,897 [PID 67820] INFO  Postprocessed 60 of 60 sources
+2026-03-15 04:49:29,898 [PID 67820] PERFORMANCE  Check_Postprocessing: 0.107s
+2026-03-15 04:49:29,898 [PID 67820] PERFORMANCE  Check (request kind: FullCheck): 11.407s
+2026-03-15 04:49:29,912 [PID 67820] ERROR Found 12 type errors!
