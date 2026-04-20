@@ -48,8 +48,27 @@ class LocalGitService:
     def __init__(self):
         self.analyzer = RiskAnalyzer()
 
+    def _normalize_repo_path(self, repo_path: str) -> str:
+        """Normalize a repository path for safe comparisons."""
+        return os.path.realpath(os.path.abspath(os.path.expanduser(repo_path)))
+
+    def _is_linked_repo_path(self, repo_path: str) -> bool:
+        """Return True when repo_path matches a linked repository path."""
+        normalized = self._normalize_repo_path(repo_path)
+        linked = _load_linked_repos()
+        linked_paths = {
+            self._normalize_repo_path(r.get("local_path", ""))
+            for r in linked
+            if r.get("local_path")
+        }
+        return normalized in linked_paths
+
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
+        repo_path = self._normalize_repo_path(repo_path)
+        if not self._is_linked_repo_path(repo_path):
+            logger.warning(f"Blocked git cmd for unlinked repo path: {repo_path}")
+            return ""
         try:
             result = subprocess.run(
                 ["git", "-C", repo_path] + args,
@@ -101,7 +120,21 @@ class LocalGitService:
 
     def get_repo_status(self, repo_path: str) -> Dict[str, Any]:
         """Full status for a single repo: changes, sync, health, risk."""
-        repo_path = os.path.expanduser(repo_path)
+        repo_path = self._normalize_repo_path(repo_path)
+        if not self._is_linked_repo_path(repo_path):
+            return {
+                "branch": "unknown",
+                "changed_files": {"staged": [], "modified": [], "untracked": []},
+                "sync": {"state": "error", "ahead": 0, "behind": 0},
+                "health": {
+                    "passing": False,
+                    "error_count": 1,
+                    "errors": [f"Path is not linked: {repo_path}"],
+                },
+                "risk": {"risk_level": "safe", "risk_probability": 0.0},
+                "ready_to_commit": False,
+                "error": "Path is not linked",
+            }
         if not os.path.isdir(repo_path):
             return {
                 "branch": "unknown",
