@@ -66,12 +66,18 @@ class LocalGitService:
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
         repo_path = self._normalize_repo_path(repo_path)
+
+        # Defense-in-depth: reject invalid/option-like paths before command execution.
+        if not repo_path or repo_path.startswith("-") or not os.path.isdir(repo_path):
+            logger.warning(f"Blocked git cmd for invalid repo path: {repo_path}")
+            return ""
+
         if not self._is_linked_repo_path(repo_path):
             logger.warning(f"Blocked git cmd for unlinked repo path: {repo_path}")
             return ""
         try:
             result = subprocess.run(
-                ["git", "-C", repo_path] + args,
+                ["git", "-C", "--", repo_path] + args,
                 capture_output=True,
                 text=True,
                 check=True,
