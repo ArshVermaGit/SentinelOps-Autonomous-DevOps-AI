@@ -10,6 +10,17 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
+def _validated_linked_repo_path(local_path: str) -> str:
+    """Normalize and validate user-provided repo path against linked repos."""
+    normalized_path = local_git._normalize_repo_path(local_path)
+    if not local_git._is_linked_repo_path(normalized_path):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or unlinked repository path.",
+        )
+    return normalized_path
+
+
 class LinkRepoRequest(BaseModel):
     name: str
     local_path: str
@@ -45,14 +56,16 @@ async def link_repo(req: LinkRepoRequest):
 @router.delete("/repos/unlink")
 async def unlink_repo(local_path: str):
     """Remove a repo from the linked list."""
-    local_git.unlink_repo(local_path)
+    validated_path = _validated_linked_repo_path(local_path)
+    local_git.unlink_repo(validated_path)
     return {"status": "unlinked"}
 
 
 @router.get("/repos/status")
 async def get_repo_status(local_path: str):
     """Get full status for a specific linked repo."""
-    status = local_git.get_repo_status(local_path)
+    validated_path = _validated_linked_repo_path(local_path)
+    status = local_git.get_repo_status(validated_path)
     if "error" in status:
         raise HTTPException(status_code=404, detail=status["error"])
     return status
@@ -61,7 +74,8 @@ async def get_repo_status(local_path: str):
 @router.post("/repos/commit")
 async def commit_repo(req: CommitRequest):
     """Stage all, commit, and push for a specific repo."""
-    result = local_git.commit_and_push(req.local_path, req.message)
+    validated_path = _validated_linked_repo_path(req.local_path)
+    result = local_git.commit_and_push(validated_path, req.message)
     if not result["success"]:
         raise HTTPException(
             status_code=500, detail=result.get("error", "Commit failed")
@@ -96,7 +110,8 @@ async def get_legacy_status():
 @router.post("/commit")
 async def commit_legacy(req: CommitRequest):
     """Legacy endpoint — commit first linked repo."""
-    result = local_git.commit_and_push(req.local_path, req.message)
+    validated_path = _validated_linked_repo_path(req.local_path)
+    result = local_git.commit_and_push(validated_path, req.message)
     if not result["success"]:
         raise HTTPException(
             status_code=500, detail=result.get("error", "Commit failed")
