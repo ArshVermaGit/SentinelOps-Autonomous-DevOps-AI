@@ -63,6 +63,15 @@ class LocalGitService:
         }
         return normalized in linked_paths
 
+    def _validate_repo_path_for_fs_access(self, repo_path: str) -> str:
+        """Validate and normalize a repo path before filesystem access."""
+        normalized = self._normalize_repo_path(repo_path)
+        if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
+            return ""
+        if not self._is_linked_repo_path(normalized):
+            return ""
+        return normalized
+
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
         repo_path = self._normalize_repo_path(repo_path)
@@ -126,8 +135,8 @@ class LocalGitService:
 
     def get_repo_status(self, repo_path: str) -> Dict[str, Any]:
         """Full status for a single repo: changes, sync, health, risk."""
-        repo_path = self._normalize_repo_path(repo_path)
-        if not self._is_linked_repo_path(repo_path):
+        repo_path = self._validate_repo_path_for_fs_access(repo_path)
+        if not repo_path:
             return {
                 "branch": "unknown",
                 "changed_files": {"staged": [], "modified": [], "untracked": []},
@@ -135,7 +144,7 @@ class LocalGitService:
                 "health": {
                     "passing": False,
                     "error_count": 1,
-                    "errors": [f"Path is not linked: {repo_path}"],
+                    "errors": ["Path is not linked"],
                 },
                 "risk": {"risk_level": "safe", "risk_probability": 0.0},
                 "ready_to_commit": False,
