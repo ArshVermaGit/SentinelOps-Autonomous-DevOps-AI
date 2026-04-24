@@ -4,9 +4,12 @@ Author: Arsh Verma
 Logic for handling natural language queries about repo health and system state.
 """
 
+import logging
 from typing import Any, Dict
 from openai import AsyncOpenAI
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 client = (
     AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
@@ -50,5 +53,6 @@ async def handle_devops_query(query: str, context_data: Dict[str, Any]) -> str:
             temperature=0.4,
         )
         return response.choices[0].message.content
-    except Exception as e:
-        return f"Error processing query: {str(e)}"
+    except Exception:
+        logger.exception("Failed to process DevOps AI query")
+        return "Sorry, I couldn't process your request right now. Please try again shortly."
