@@ -45,6 +45,17 @@ def _save_linked_repos(repos: List[Dict[str, str]]) -> None:
 class LocalGitService:
     """Handles git operations for any repository path on the local machine."""
 
+    _ALLOWED_GIT_ARGS = {
+        ("status", "--porcelain"),
+        ("diff", "--cached"),
+        ("diff",),
+        ("rev-list", "--left-right", "--count", "@{upstream}...HEAD"),
+        ("branch", "--show-current"),
+        ("add", "."),
+        ("commit", "-m"),
+        ("push",),
+    }
+
     def __init__(self):
         self.analyzer = RiskAnalyzer()
 
@@ -84,9 +95,18 @@ class LocalGitService:
         if not self._is_linked_repo_path(repo_path):
             logger.warning(f"Blocked git cmd for unlinked repo path: {repo_path}")
             return ""
+
+        args_key = tuple(args)
+        if (
+            args_key not in self._ALLOWED_GIT_ARGS
+            and not (len(args) >= 3 and args[0] == "commit" and args[1] == "-m")
+        ):
+            logger.warning(f"Blocked git cmd with disallowed args in {repo_path}: {args}")
+            return ""
+
         try:
             result = subprocess.run(
-                ["git", "-C", "--", repo_path] + args,
+                ["git", "-C", repo_path] + args,
                 capture_output=True,
                 text=True,
                 check=True,
