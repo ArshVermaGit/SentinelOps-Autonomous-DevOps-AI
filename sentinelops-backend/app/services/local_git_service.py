@@ -79,21 +79,24 @@ class LocalGitService:
         normalized = self._normalize_repo_path(repo_path)
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
             return ""
-        if not self._is_linked_repo_path(normalized):
+
+        linked = _load_linked_repos()
+        linked_paths = {
+            self._normalize_repo_path(r.get("local_path", ""))
+            for r in linked
+            if r.get("local_path")
+        }
+        if normalized not in linked_paths:
             return ""
         return normalized
 
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
-        repo_path = self._normalize_repo_path(repo_path)
+        repo_path = self._validate_repo_path_for_fs_access(repo_path)
 
         # Defense-in-depth: reject invalid/option-like paths before command execution.
-        if not repo_path or repo_path.startswith("-") or not os.path.isdir(repo_path):
+        if not repo_path or not os.path.isdir(repo_path):
             logger.warning(f"Blocked git cmd for invalid repo path: {repo_path}")
-            return ""
-
-        if not self._is_linked_repo_path(repo_path):
-            logger.warning(f"Blocked git cmd for unlinked repo path: {repo_path}")
             return ""
 
         args_key = tuple(args)
