@@ -12,13 +12,13 @@ router = APIRouter()
 
 def _validated_linked_repo_path(local_path: str) -> str:
     """Normalize and validate user-provided repo path against linked repos."""
-    normalized_path = local_git._normalize_repo_path(local_path)
-    if not local_git._is_linked_repo_path(normalized_path):
+    validated_path = local_git._validate_repo_path_for_fs_access(local_path)
+    if not validated_path:
         raise HTTPException(
             status_code=400,
             detail="Invalid or unlinked repository path.",
         )
-    return normalized_path
+    return validated_path
 
 
 class LinkRepoRequest(BaseModel):

@@ -79,21 +79,35 @@ class LocalGitService:
         normalized = self._normalize_repo_path(repo_path)
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
             return ""
-        if not self._is_linked_repo_path(normalized):
+
+        linked = _load_linked_repos()
+        linked_paths = {
+            self._normalize_repo_path(r.get("local_path", ""))
+            for r in linked
+            if r.get("local_path")
+        }
+        if normalized not in linked_paths:
+            return ""
+        return normalized
+
+    def _validate_repo_path_for_linking(self, repo_path: str) -> str:
+        """Validate and normalize a repo path before adding it to linked repos."""
+        normalized = self._normalize_repo_path(repo_path)
+        if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
+            return ""
+        if not os.path.isdir(normalized):
+            return ""
+        if not os.path.isdir(os.path.join(normalized, ".git")):
             return ""
         return normalized
 
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
-        repo_path = self._normalize_repo_path(repo_path)
+        repo_path = self._validate_repo_path_for_fs_access(repo_path)
 
         # Defense-in-depth: reject invalid/option-like paths before command execution.
-        if not repo_path or repo_path.startswith("-") or not os.path.isdir(repo_path):
+        if not repo_path or not os.path.isdir(repo_path):
             logger.warning(f"Blocked git cmd for invalid repo path: {repo_path}")
-            return ""
-
-        if not self._is_linked_repo_path(repo_path):
-            logger.warning(f"Blocked git cmd for unlinked repo path: {repo_path}")
             return ""
 
         args_key = tuple(args)
@@ -133,14 +147,20 @@ class LocalGitService:
 
     def link_repo(self, name: str, local_path: str, github_url: str) -> bool:
         """Link a new repo by its local folder path."""
-        local_path = os.path.expanduser(local_path)
-        if not os.path.isdir(os.path.join(local_path, ".git")):
+        validated_path = self._validate_repo_path_for_linking(local_path)
+        if not validated_path:
             return False
         repos = _load_linked_repos()
-        # Prevent duplicates
-        if any(r["local_path"] == local_path for r in repos):
+        # Prevent duplicates (compare canonicalized paths)
+        if any(
+            self._normalize_repo_path(r.get("local_path", "")) == validated_path
+            for r in repos
+            if r.get("local_path")
+        ):
             return True
-        repos.append({"name": name, "local_path": local_path, "github_url": github_url})
+        repos.append(
+            {"name": name, "local_path": validated_path, "github_url": github_url}
+        )
         _save_linked_repos(repos)
         return True
 
