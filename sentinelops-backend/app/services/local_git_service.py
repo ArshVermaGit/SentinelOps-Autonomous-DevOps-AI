@@ -25,6 +25,9 @@ logger = logging.getLogger(__name__)
 REPOS_CONFIG_PATH = os.path.join(
     os.path.dirname(__file__), "..", "..", "linked_repos.json"
 )
+ALLOWED_REPO_ROOT = os.path.realpath(
+    os.path.abspath(os.path.expanduser(os.environ.get("SENTINELOPS_REPO_ROOT", os.getcwd())))
+)
 
 
 def _load_linked_repos() -> List[Dict[str, str]]:
@@ -90,10 +93,19 @@ class LocalGitService:
             return ""
         return normalized
 
+    def _is_within_allowed_root(self, normalized_path: str) -> bool:
+        """Return True if normalized_path is inside configured allowed repo root."""
+        try:
+            return os.path.commonpath([normalized_path, ALLOWED_REPO_ROOT]) == ALLOWED_REPO_ROOT
+        except ValueError:
+            return False
+
     def _validate_repo_path_for_linking(self, repo_path: str) -> str:
         """Validate and normalize a repo path before adding it to linked repos."""
         normalized = self._normalize_repo_path(repo_path)
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
+            return ""
+        if not self._is_within_allowed_root(normalized):
             return ""
         if not os.path.isdir(normalized):
             return ""
