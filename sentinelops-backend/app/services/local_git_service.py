@@ -136,15 +136,25 @@ class LocalGitService:
             return ""
         if not self._is_within_allowed_root(normalized):
             return ""
+
+        normalized_real = os.path.realpath(normalized)
+        if normalized_real != normalized:
+            return ""
+
         # Do not allow linking via symlinked repository directories.
         if os.path.islink(normalized):
             return ""
         if not os.path.isdir(normalized):
             return ""
+
         git_dir = os.path.join(normalized, ".git")
         git_dir_real = os.path.realpath(git_dir)
+        normalized_prefix = normalized + os.sep
         try:
-            if os.path.commonpath([git_dir_real, normalized]) != normalized:
+            if not (
+                git_dir_real == normalized
+                or git_dir_real.startswith(normalized_prefix)
+            ):
                 return ""
         except ValueError:
             return ""
