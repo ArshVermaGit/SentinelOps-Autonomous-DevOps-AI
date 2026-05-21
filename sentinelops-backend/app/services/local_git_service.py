@@ -135,6 +135,9 @@ class LocalGitService:
             return ""
         if not self._is_within_allowed_root(normalized):
             return ""
+        # Do not allow linking via symlinked repository directories.
+        if os.path.islink(normalized):
+            return ""
         if not os.path.isdir(normalized):
             return ""
         git_dir = os.path.join(normalized, ".git")
