@@ -109,16 +109,14 @@ class LocalGitService:
     def _is_within_allowed_root(self, normalized_path: str) -> bool:
         """Return True if normalized_path is inside configured allowed repo root."""
         try:
-            if (
-                not ALLOWED_REPO_ROOT
-                or not os.path.isabs(ALLOWED_REPO_ROOT)
-                or not os.path.isdir(ALLOWED_REPO_ROOT)
-            ):
+            if not ALLOWED_REPO_ROOT:
                 return False
-            return (
-                os.path.commonpath([normalized_path, ALLOWED_REPO_ROOT])
-                == ALLOWED_REPO_ROOT
+            allowed_root = os.path.realpath(
+                os.path.abspath(os.path.expanduser(ALLOWED_REPO_ROOT))
             )
+            if not os.path.isabs(allowed_root) or not os.path.isdir(allowed_root):
+                return False
+            return os.path.commonpath([normalized_path, allowed_root]) == allowed_root
         except ValueError:
             return False
 
@@ -134,6 +132,9 @@ class LocalGitService:
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
             return ""
         if not self._is_within_allowed_root(normalized):
+            return ""
+        # Do not allow linking via symlinked repository directories.
+        if os.path.islink(normalized):
             return ""
         if not os.path.isdir(normalized):
             return ""
