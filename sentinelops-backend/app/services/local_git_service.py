@@ -28,8 +28,11 @@ ValidatedRepoPath = NewType("ValidatedRepoPath", str)
 REPOS_CONFIG_PATH = os.path.join(
     os.path.dirname(__file__), "..", "..", "linked_repos.json"
 )
-ALLOWED_REPO_ROOT = os.path.realpath(
-    os.path.abspath(os.path.expanduser(os.environ.get("SENTINELOPS_REPO_ROOT", os.getcwd())))
+_configured_repo_root = os.environ.get("SENTINELOPS_REPO_ROOT")
+ALLOWED_REPO_ROOT = (
+    os.path.realpath(os.path.abspath(os.path.expanduser(_configured_repo_root)))
+    if _configured_repo_root
+    else ""
 )
 
 
