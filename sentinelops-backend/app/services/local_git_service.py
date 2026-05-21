@@ -136,7 +136,13 @@ class LocalGitService:
             return ""
         if not os.path.isdir(normalized):
             return ""
-        if not os.path.isdir(os.path.join(normalized, ".git")):
+        git_dir = os.path.realpath(os.path.join(normalized, ".git"))
+        try:
+            if os.path.commonpath([git_dir, normalized]) != normalized:
+                return ""
+        except ValueError:
+            return ""
+        if not os.path.isdir(git_dir):
             return ""
         return normalized
 
