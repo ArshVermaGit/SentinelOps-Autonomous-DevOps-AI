@@ -498,19 +498,33 @@ class LocalGitService:
 
             await db.commit()
 
+    def _sanitize_commit_message(self, message: str) -> str:
+        """Validate and sanitize commit message before process execution."""
+        if not isinstance(message, str):
+            return ""
+        cleaned = message.strip()
+        if not cleaned:
+            return ""
+        if "\x00" in cleaned or "\n" in cleaned or "\r" in cleaned:
+            return ""
+        if len(cleaned) > 512:
+            return ""
+        return cleaned
+
     def commit_and_push(self, repo_path: str, message: str) -> Dict[str, Any]:
         """Stage all, commit, and push to remote."""
         # Note: In a real app, we'd pass the DB session here to record the success
         # but for now we'll do it via the next sync cycle.
         repo_path = os.path.expanduser(repo_path)
-        if not message.strip():
+        safe_message = self._sanitize_commit_message(message)
+        if not safe_message:
             return {"success": False, "error": "Empty commit message"}
 
         # Stage everything
         self.stage_all(repo_path)
 
         # Commit
-        commit_out = self._run_git(repo_path, ["commit", "-m", message])
+        commit_out = self._run_git(repo_path, ["commit", "-m", safe_message])
         if not commit_out:
             return {"success": False, "error": "Nothing to commit or commit failed"}
 
