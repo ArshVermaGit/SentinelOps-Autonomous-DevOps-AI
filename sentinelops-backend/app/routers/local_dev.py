@@ -18,7 +18,7 @@ def _validated_linked_repo_path(local_path: str) -> str:
             status_code=400,
             detail="Invalid or unlinked repository path.",
         )
-    return validated_path
+    return str(validated_path)
 
 
 class LinkRepoRequest(BaseModel):

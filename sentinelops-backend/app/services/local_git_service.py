@@ -9,7 +9,7 @@ import logging
 import os
 import subprocess
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, NewType, Optional
 
 from app.models.ci_run import CIRun  # pyre-ignore[21]
 from app.models.incident import Incident  # pyre-ignore[21]
@@ -21,6 +21,8 @@ from sqlalchemy import select  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 
 logger = logging.getLogger(__name__)
+
+ValidatedRepoPath = NewType("ValidatedRepoPath", str)
 
 REPOS_CONFIG_PATH = os.path.join(
     os.path.dirname(__file__), "..", "..", "linked_repos.json"
@@ -77,19 +79,21 @@ class LocalGitService:
         }
         return normalized in linked_paths
 
-    def _validate_repo_path_for_fs_access(self, repo_path: str) -> str:
+    def _validate_repo_path_for_fs_access(
+        self, repo_path: str
+    ) -> Optional[ValidatedRepoPath]:
         """Validate and normalize a repo path before filesystem access."""
         if not isinstance(repo_path, str):
-            return ""
+            return None
         candidate = repo_path.strip()
         if not candidate or "\x00" in candidate:
-            return ""
+            return None
 
         normalized = self._normalize_repo_path(candidate)
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
-            return ""
+            return None
         if not self._is_within_allowed_root(normalized):
-            return ""
+            return None
 
         linked = _load_linked_repos()
         linked_paths = {
@@ -98,8 +102,8 @@ class LocalGitService:
             if r.get("local_path")
         }
         if normalized not in linked_paths:
-            return ""
-        return normalized
+            return None
+        return ValidatedRepoPath(normalized)
 
     def _is_within_allowed_root(self, normalized_path: str) -> bool:
         """Return True if normalized_path is inside configured allowed repo root."""
@@ -138,11 +142,16 @@ class LocalGitService:
 
     def _run_git(self, repo_path: str, args: List[str]) -> str:
         """Run a git command in a specific repo directory."""
-        repo_path = self._validate_repo_path_for_fs_access(repo_path)
+        validated_repo_path = self._validate_repo_path_for_fs_access(repo_path)
 
         # Defense-in-depth: reject invalid/option-like paths before command execution.
-        if not repo_path or not os.path.isdir(repo_path):
+        if not validated_repo_path:
             logger.warning(f"Blocked git cmd for invalid repo path: {repo_path}")
+            return ""
+
+        repo_path_str = str(validated_repo_path)
+        if not os.path.isdir(repo_path_str):
+            logger.warning(f"Blocked git cmd for invalid repo path: {repo_path_str}")
             return ""
 
         args_key = tuple(args)
@@ -150,12 +159,12 @@ class LocalGitService:
             args_key not in self._ALLOWED_GIT_ARGS
             and not (len(args) >= 3 and args[0] == "commit" and args[1] == "-m")
         ):
-            logger.warning(f"Blocked git cmd with disallowed args in {repo_path}: {args}")
+            logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
             return ""
 
         try:
             result = subprocess.run(
-                ["git", "-C", repo_path] + args,
+                ["git", "-C", repo_path_str] + args,
                 capture_output=True,
                 text=True,
                 check=True,
@@ -163,10 +172,10 @@ class LocalGitService:
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            logger.warning(f"Git cmd failed in {repo_path}: {e.stderr.strip()}")
+            logger.warning(f"Git cmd failed in {repo_path_str}: {e.stderr.strip()}")
             return ""
         except subprocess.TimeoutExpired:
-            logger.warning(f"Git cmd timed out in {repo_path}")
+            logger.warning(f"Git cmd timed out in {repo_path_str}")
             return ""
 
     # ── Repo Management ──────────────────────────────────────────────
@@ -210,8 +219,8 @@ class LocalGitService:
 
     def get_repo_status(self, repo_path: str) -> Dict[str, Any]:
         """Full status for a single repo: changes, sync, health, risk."""
-        repo_path = self._validate_repo_path_for_fs_access(repo_path)
-        if not repo_path:
+        validated_repo_path = self._validate_repo_path_for_fs_access(repo_path)
+        if not validated_repo_path:
             return {
                 "branch": "unknown",
                 "changed_files": {"staged": [], "modified": [], "untracked": []},
@@ -225,6 +234,7 @@ class LocalGitService:
                 "ready_to_commit": False,
                 "error": "Path is not linked",
             }
+        repo_path = str(validated_repo_path)
         if not os.path.isdir(repo_path):
             return {
                 "branch": "unknown",
@@ -488,19 +498,33 @@ class LocalGitService:
 
             await db.commit()
 
+    def _sanitize_commit_message(self, message: str) -> str:
+        """Validate and sanitize commit message before process execution."""
+        if not isinstance(message, str):
+            return ""
+        cleaned = message.strip()
+        if not cleaned:
+            return ""
+        if "\x00" in cleaned or "\n" in cleaned or "\r" in cleaned:
+            return ""
+        if len(cleaned) > 512:
+            return ""
+        return cleaned
+
     def commit_and_push(self, repo_path: str, message: str) -> Dict[str, Any]:
         """Stage all, commit, and push to remote."""
         # Note: In a real app, we'd pass the DB session here to record the success
         # but for now we'll do it via the next sync cycle.
         repo_path = os.path.expanduser(repo_path)
-        if not message.strip():
+        safe_message = self._sanitize_commit_message(message)
+        if not safe_message:
             return {"success": False, "error": "Empty commit message"}
 
         # Stage everything
         self.stage_all(repo_path)
 
         # Commit
-        commit_out = self._run_git(repo_path, ["commit", "-m", message])
+        commit_out = self._run_git(repo_path, ["commit", "-m", safe_message])
         if not commit_out:
             return {"success": False, "error": "Nothing to commit or commit failed"}
 
