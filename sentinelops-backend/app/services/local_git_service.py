@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import subprocess
+import tempfile
 from datetime import datetime
 from typing import Any, Dict, List, NewType, Optional
 
@@ -157,8 +158,10 @@ class LocalGitService:
             return ""
 
         args_key = tuple(args)
-        is_commit_with_message = len(args) == 3 and args[0] == "commit" and args[1] == "-m"
-        if args_key not in self._ALLOWED_GIT_ARGS and not is_commit_with_message:
+        is_commit_with_file = (
+            len(args) == 3 and args[0] == "commit" and args[1] == "--file"
+        )
+        if args_key not in self._ALLOWED_GIT_ARGS and not is_commit_with_file:
             logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
             return ""
 
@@ -173,14 +176,21 @@ class LocalGitService:
             cmd = ["git", "-C", repo_path_str, "add", "."]
         elif args_key == ("push",):
             cmd = ["git", "-C", repo_path_str, "push"]
-        elif is_commit_with_message:
-            safe_commit_message = self._sanitize_commit_message(args[2])
-            if not safe_commit_message or safe_commit_message != args[2]:
+        elif is_commit_with_file:
+            message_file = args[2]
+            if (
+                not isinstance(message_file, str)
+                or not message_file
+                or message_file.startswith("-")
+                or "\x00" in message_file
+                or not os.path.isabs(message_file)
+                or not os.path.isfile(message_file)
+            ):
                 logger.warning(
-                    f"Blocked git cmd with invalid commit message in {repo_path_str}"
+                    f"Blocked git cmd with invalid commit message file in {repo_path_str}"
                 )
                 return ""
-            cmd = ["git", "-C", repo_path_str, "commit", "-m", safe_commit_message]
+            cmd = ["git", "-C", repo_path_str, "commit", "--file", message_file]
         else:
             logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
             return ""
@@ -549,14 +559,27 @@ class LocalGitService:
         # Stage everything
         self.stage_all(repo_path)
 
-        # Commit
-        commit_out = self._run_git(repo_path, ["commit", "-m", safe_message])
-        if not commit_out:
-            return {"success": False, "error": "Nothing to commit or commit failed"}
+        temp_message_file = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8") as tmp:
+                tmp.write(safe_message)
+                tmp.flush()
+                temp_message_file = tmp.name
 
-        # Push
-        self._run_git(repo_path, ["push"])
-        return {"success": True, "message": "Changes committed and pushed to GitHub"}
+            # Commit
+            commit_out = self._run_git(repo_path, ["commit", "--file", temp_message_file])
+            if not commit_out:
+                return {"success": False, "error": "Nothing to commit or commit failed"}
+
+            # Push
+            self._run_git(repo_path, ["push"])
+            return {"success": True, "message": "Changes committed and pushed to GitHub"}
+        finally:
+            if temp_message_file and os.path.exists(temp_message_file):
+                try:
+                    os.remove(temp_message_file)
+                except OSError:
+                    logger.warning("Failed to remove temporary commit message file.")
 
 
 local_git = LocalGitService()
