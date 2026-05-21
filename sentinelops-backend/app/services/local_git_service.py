@@ -157,12 +157,17 @@ class LocalGitService:
             return ""
 
         args_key = tuple(args)
-        if (
-            args_key not in self._ALLOWED_GIT_ARGS
-            and not (len(args) >= 3 and args[0] == "commit" and args[1] == "-m")
-        ):
+        is_commit_with_message = len(args) == 3 and args[0] == "commit" and args[1] == "-m"
+        if args_key not in self._ALLOWED_GIT_ARGS and not is_commit_with_message:
             logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
             return ""
+        if is_commit_with_message:
+            safe_commit_message = self._sanitize_commit_message(args[2])
+            if not safe_commit_message or safe_commit_message != args[2]:
+                logger.warning(
+                    f"Blocked git cmd with invalid commit message in {repo_path_str}"
+                )
+                return ""
 
         try:
             result = subprocess.run(
@@ -508,6 +513,9 @@ class LocalGitService:
         if not cleaned:
             return ""
         if "\x00" in cleaned or "\n" in cleaned or "\r" in cleaned:
+            return ""
+        # Prevent option-like values from being interpreted as git flags.
+        if cleaned.startswith("-"):
             return ""
         if len(cleaned) > 512:
             return ""
