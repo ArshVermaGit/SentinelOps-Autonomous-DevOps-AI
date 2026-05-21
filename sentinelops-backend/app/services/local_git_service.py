@@ -161,17 +161,33 @@ class LocalGitService:
         if args_key not in self._ALLOWED_GIT_ARGS and not is_commit_with_message:
             logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
             return ""
-        if is_commit_with_message:
+
+        cmd: List[str]
+        if args_key == ("status", "--short"):
+            cmd = ["git", "-C", repo_path_str, "status", "--short"]
+        elif args_key == ("diff", "--cached", "--name-only"):
+            cmd = ["git", "-C", repo_path_str, "diff", "--cached", "--name-only"]
+        elif args_key == ("diff", "--name-only"):
+            cmd = ["git", "-C", repo_path_str, "diff", "--name-only"]
+        elif args_key == ("add", "."):
+            cmd = ["git", "-C", repo_path_str, "add", "."]
+        elif args_key == ("push",):
+            cmd = ["git", "-C", repo_path_str, "push"]
+        elif is_commit_with_message:
             safe_commit_message = self._sanitize_commit_message(args[2])
             if not safe_commit_message or safe_commit_message != args[2]:
                 logger.warning(
                     f"Blocked git cmd with invalid commit message in {repo_path_str}"
                 )
                 return ""
+            cmd = ["git", "-C", repo_path_str, "commit", "-m", safe_commit_message]
+        else:
+            logger.warning(f"Blocked git cmd with disallowed args in {repo_path_str}: {args}")
+            return ""
 
         try:
             result = subprocess.run(
-                ["git", "-C", repo_path_str] + args,
+                cmd,
                 capture_output=True,
                 text=True,
                 check=True,
