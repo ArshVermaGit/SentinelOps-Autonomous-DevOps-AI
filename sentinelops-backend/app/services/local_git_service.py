@@ -79,8 +79,16 @@ class LocalGitService:
 
     def _validate_repo_path_for_fs_access(self, repo_path: str) -> str:
         """Validate and normalize a repo path before filesystem access."""
-        normalized = self._normalize_repo_path(repo_path)
+        if not isinstance(repo_path, str):
+            return ""
+        candidate = repo_path.strip()
+        if not candidate or "\x00" in candidate:
+            return ""
+
+        normalized = self._normalize_repo_path(candidate)
         if not normalized or normalized.startswith("-") or not os.path.isabs(normalized):
+            return ""
+        if not self._is_within_allowed_root(normalized):
             return ""
 
         linked = _load_linked_repos()
