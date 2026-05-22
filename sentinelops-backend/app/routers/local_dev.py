@@ -41,7 +41,16 @@ async def list_repos():
 @router.post("/repos/link")
 async def link_repo(req: LinkRepoRequest):
     """Link a GitHub repo to a local folder."""
-    success = local_git.link_repo(req.name, req.local_path, req.github_url)
+    validated_path = local_git._validate_repo_path_for_linking(req.local_path)
+    if not validated_path:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid path — no .git directory found. "
+                "Make sure the folder is a git repo."
+            ),
+        )
+    success = local_git.link_repo(req.name, validated_path, req.github_url)
     if not success:
         raise HTTPException(
             status_code=400,
@@ -50,7 +59,7 @@ async def link_repo(req: LinkRepoRequest):
                 "Make sure the folder is a git repo."
             ),
         )
-    return {"status": "linked", "name": req.name, "local_path": req.local_path}
+    return {"status": "linked", "name": req.name, "local_path": validated_path}
 
 
 @router.delete("/repos/unlink")
