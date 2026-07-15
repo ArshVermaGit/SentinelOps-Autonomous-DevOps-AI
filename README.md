@@ -21,6 +21,9 @@
 - 🧠 **Automated Root Cause**: LLM-powered log analysis provides natural language explanations for test/build failures.
 - 🔍 **Similarity Search**: Matches new failures against historical incident patterns using vector embeddings.
 
+
+
+
 ---
 
 ## 🎯 The Problem
